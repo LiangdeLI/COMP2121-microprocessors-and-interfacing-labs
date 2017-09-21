@@ -5,10 +5,11 @@
 ; Author : Liangde Li z5077896 Dankoon Yoo z5116090
 ;
 
+; wire PC0-3 to LED0-3, PB0-1 to PF0-1 
+
 .include "m2560def.inc"
 .def temp =r16
-;.equ PATTERN1 = 0x5B
-;.equ PATTERN2 = 0xAA
+
 .cseg
 .org 0x0
 ldi r17, 1
