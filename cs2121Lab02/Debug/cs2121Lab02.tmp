@@ -1,0 +1,31 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.6</VERSION>
+ <DEVICE>"ATmega2560"</DEVICE>
+ <WORKING_DIR>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121Lab02\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121Lab02\TaskC.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121Lab02\Debug\cs2121Lab02.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>cs2121Lab02.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>cs2121Lab02.map</FILE>
+  <FILE>cs2121Lab02.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <counter><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121Lab02\TaskC.asm</FILE><LINE>12</LINE></counter>
+  <move><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121Lab02\TaskC.asm</FILE><LINE>37</LINE></move>
+  <loopforever><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121Lab02\TaskC.asm</FILE><LINE>35</LINE></loopforever>
+  <one_case><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121Lab02\TaskC.asm</FILE><LINE>78</LINE></one_case>
+  <epilogue><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121Lab02\TaskC.asm</FILE><LINE>86</LINE></epilogue>
+ </LABELS>
+</ASSEMBLER_INFO>
