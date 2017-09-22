@@ -3,12 +3,18 @@
  *
  *  Created: 22/09/2017 2:21:55 PM
  *   Author: Liangde Li z5077896 Dankoon Yoo z5116090
+ *   wire PC0-7 to LED0-7
  */ 
+
+
  .include "m2560def.inc"
  .def temp = r16
  .equ PATTERN = 0b11110000 ; define a pattern for 8 LEDs
- .def leds = r17 ; r17 stores a LED pattern
- ;.equ START_TIME = 0b00000000 ; 0b11011111
+ .def leds = r20 ; r20 stores a LED pattern
+ .def mins = r17
+ .def secd = r18
+ .def mask = r19
+ .equ START_TIME = 0b00000000 ; 0b11011111
  ;.equ PATTERN = 0xFF
  
  ; The macro clears a word (2 bytes) in the data memory
@@ -36,6 +42,8 @@
  DEFAULT: reti ; no interrupt handling 
  
  RESET: 
+ ldi secd, 0
+ ldi mins, 0
  ldi temp, high(RAMEND) ; initialize the stack pointer SP
  out SPH, temp
  ldi temp, low(RAMEND)
@@ -60,8 +68,17 @@
  ldi temp, high(7812) ; 7812 = 106/128
  cpc r25, temp
  brne NotSecond
- com leds ; one second has passed, and toggle LEDs now
- out PORTC, leds
+ 
+ rjmp calculate_value
+
+ end_calculation:
+  out PORTC, leds
+  inc secd
+  cpi secd, 60
+  brne continue
+  ldi secd, 0
+  inc mins
+  continue:
  clear TempCounter ; reset the temporary counter
  ; Load the value of the second counter
  lds r24, SecondCounter
@@ -70,9 +87,11 @@
  sts SecondCounter, r24
  sts SecondCounter+1, r25
  rjmp EndIF
+ 
  NotSecond: ; store the new value of the temporary counter
  sts TempCounter, r24
  sts TempCounter+1, r25
+ 
  EndIF: pop r24 ; epilogue starts
  pop r25 ; restore all conflicting registers from the stack
  pop YL
@@ -81,6 +100,63 @@
  out SREG, temp
  reti ; return from the interrupt
 
+ calculate_value:
+   clr leds
+  
+  ldi mask, 0b00100000
+  and mask, secd
+  lsr mask ; shift right 3
+  lsr mask
+  lsr mask
+  or leds, mask
+
+  ldi mask, 0b00010000
+  and mask, secd
+  lsr mask
+  or leds, mask
+
+  ldi mask, 0b00001000
+  and mask, secd
+  lsl mask
+  or leds, mask
+
+  ldi mask, 0b00000100
+  and mask, secd
+  lsl mask
+  lsl mask
+  lsl mask
+  or leds, mask
+
+  ldi mask, 0b00000010
+  and mask, secd
+  lsl mask
+  lsl mask
+  lsl mask
+  lsl mask
+  lsl mask
+  or leds, mask
+
+  ldi mask, 0b00000001
+  and mask, secd
+  lsl mask
+  lsl mask
+  lsl mask
+  lsl mask
+  lsl mask
+  lsl mask
+  lsl mask
+  or leds, mask
+
+  ldi mask, 0b00000001
+  and mask, mins
+  lsl mask
+  or leds, mask
+
+  ldi mask, 0b00000010
+  and mask, mins
+  lsr mask
+  or leds, mask
+  jmp end_calculation
 
  main: 
  ldi leds, 0x00 ; main program starts here
@@ -95,5 +171,5 @@
  ldi temp, 1<<TOIE0 ; TOIE0 is the bit number of TOIE0 which is 0
  sts TIMSK0, temp ; enable Timer0 Overflow Interrupt
  sei ; enable global interrupt
- loop: 
- rjmp loop ; loop forever
+ end_loop: 
+ rjmp end_loop ; loop forever

@@ -3,6 +3,7 @@
  *
  *  Created: 22/09/2017 2:27:22 AM
  *   Author: Liangde Li z5077896 Dankoon Yoo z5116090
+ *   wire PC0-3 to LED0-3, PB0 to RDX4, PB1 to RDX3
  */ 
 
  .include "m2560def.inc"

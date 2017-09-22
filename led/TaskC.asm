@@ -3,6 +3,7 @@
  *
  *  Created: 22/09/2017 1:25:24 PM
  *   Author: Liangde Li z5077896 Dankoon Yoo z5116090
+ *   wire PC0-7 to LED0-7
  */ 
 
   .include "m2560def.inc"
