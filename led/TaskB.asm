@@ -8,6 +8,7 @@
  .include "m2560def.inc"
 .def temp =r16
 .def led = r22
+.def flag = r24
 .cseg
 .org 0x0
 jmp RESET
@@ -40,14 +41,23 @@ EXT_INT0:
 push temp
 in temp, SREG
 push temp
+cpi flag, 1
+brne real_int0
+clr flag
+pop temp
+out SREG, temp
+pop temp
+reti
+real_int0:
 ldi r17, 0b10000
 ldi r21, 0
 ldi r23, 1
 sub led, r17
 out PORTC, led
-ldi r18, 0x00  
-ldi r19, 0x00
-ldi r20, 0x20
+ldi flag, 1
+ldi r18, 0xDB  
+ldi r19, 0x7C
+ldi r20, 0x03
 delay1:
 sub r18, r23
 sbc r19, r21
@@ -65,14 +75,23 @@ EXT_INT1:
 push temp
 in temp, SREG
 push temp
+cpi flag, 1
+brne real_int1
+clr flag
+pop temp
+out SREG, temp
+pop temp
+reti
+real_int1:
 ldi r17, 0b10000
 ldi r21, 0
 ldi r23, 1
 add led, r17
 out PORTC, led
-ldi r18, 0x00   
-ldi r19, 0x00
-ldi r20, 0x20
+ldi flag, 1
+ldi r18, 0xDB   
+ldi r19, 0x7C
+ldi r20, 0x03
 delay2:
 sub r18, r23
 sbc r19, r21
@@ -88,6 +107,7 @@ reti
 
 main: ; main - does nothing but increment a counter
 clr temp
+clr flag
 loop:
 inc temp
 rjmp loop
