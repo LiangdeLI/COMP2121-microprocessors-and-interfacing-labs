@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm Thu Oct 12 22:47:20 2017
+AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskB.asm Fri Oct 13 00:25:04 2017
 
 
 EQU  SIGNATURE_000 0000001e
@@ -1359,35 +1359,40 @@ EQU  URXC3addr    0000006c
 EQU  UDRE3addr    0000006e
 EQU  UTXC3addr    00000070
 EQU  INT_VECTORS_SIZE 00000072
-EQU  PATTERN      000000f0
-DEF  temp         r21
-DEF  mins_1       r17
-DEF  mins_0       r22
-DEF  secd_1       r18
-DEF  secd_0       r23
+DEF  temp         r16
+DEF  row          r17
+DEF  col          r18
 DEF  mask         r19
-EQU  START_TIME   00000000
-DSEG SecondCounter 00000200
-DSEG TempCounter  00000202
-CSEG RESET        00000033
-CSEG DEFAULT      00000032
-CSEG Timer0OVF    00000042
-CSEG main         000000e6
-CSEG NotSecond    00000052
-CSEG end_calculation 0000005d
-CSEG EndIF        00000056
-CSEG lcd_command  000000aa
-CSEG lcd_wait     000000c4
-CSEG sleep_5ms    000000e0
-CSEG sleep_1ms    000000d7
-CSEG lcd_data     000000b5
-CSEG go_on        0000009b
+DEF  temp2        r20
+EQU  PORTLDIR     000000f0
+EQU  INITCOLMASK  000000ef
+EQU  INITROWMASK  00000001
+EQU  ROWMASK      0000000f
+CSEG RESET        00000072
+CSEG lcd_command  0000010c
+CSEG lcd_wait     00000126
+CSEG sleep_5ms    00000142
+CSEG sleep_1ms    00000139
+CSEG main         0000009a
+CSEG colloop      0000009c
+CSEG delay        0000009f
+CSEG nextcol      000000b2
+CSEG rowloop      000000a8
+CSEG skipconv     000000ae
+CSEG convert      000000b9
+CSEG go_on        000000d6
+CSEG letters      000000e5
+CSEG symbols      000000ed
+CSEG lcd_data     00000117
+CSEG convert_end  000000fe
+CSEG star         000000f6
+CSEG zero         000000fb
+CSEG delay_in     00000104
 EQU  LCD_RS       00000007
 EQU  LCD_E        00000006
 EQU  LCD_RW       00000005
 EQU  LCD_BE       00000004
-CSEG lcd_wait_loop 000000c9
+CSEG lcd_wait_loop 0000012b
 EQU  F_CPU        00f42400
 EQU  DELAY_1MS    00000f9c
-CSEG delayloop_1ms 000000db
-CSEG end_loop     000000f8
+CSEG delayloop_1ms 0000013d

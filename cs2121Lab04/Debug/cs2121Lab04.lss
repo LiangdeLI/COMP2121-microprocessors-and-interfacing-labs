@@ -1,12 +1,12 @@
 
-AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm Thu Oct 12 22:47:20 2017
+AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskB.asm Fri Oct 13 00:25:04 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
-C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm(11): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
+C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskB.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
-C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm(11): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
+C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskB.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
                                  
-                                 ;
+                                 /*
                                  
                                  ;***** Created: 2011-02-09 12:03 ******* Source: ATmega2560.xml **********
                                  ;*************************************************************************
@@ -1844,15 +1844,12 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm(11): Inc
                                  
                                  ; ***** END OF FILE ******************************************************
                                  
-                                 ; cs2121Lab04.asm
-                                 ;
-                                 ; Created: 6/10/2017 2:45:12 PM
-                                 ; Author : Liangde Li z5077896 Dankoon Yoo z5116090
-                                 ;
+                                  * TaskB.asm
+                                  *
+                                  *  Created: 12/10/2017 10:55:56 PM
+                                  *   Author: Liangde Li z5077896 Dankoon Yoo z5116090
+                                  */ 
                                  
-                                 ; Board settings: 1. Connect LCD data pins D0-D7 to PORTF0-7.
-                                 ; 2. Connect the four LCD control pins BE-RS to PORTA4-7.
-                                   
                                  .include "m2560def.inc"
                                  
                                  ;***** Created: 2011-02-09 12:03 ******* Source: ATmega2560.xml **********
@@ -1897,22 +1894,15 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm(11): Inc
                                  #endif  /* _M2560DEF_INC_ */
                                  
                                  ; ***** END OF FILE ******************************************************
-                                 .equ PATTERN = 0b11110000 
-                                  .def temp = r21
-                                  .def mins_1 = r17
-                                  .def mins_0 = r22
-                                  .def secd_1 = r18
-                                  .def secd_0 = r23
-                                  .def mask = r19
-                                  .equ START_TIME = 0b00000000 ;
-                                 
-                                   .macro clear
-                                  ldi YL, low(@0) ; load the memory address to Y pointer
-                                  ldi YH, high(@0)
-                                  clr temp ; set temp to 0
-                                  st Y+, temp ; clear the two bytes at @0 in SRAM
-                                  st Y, temp
-                                  .endmacro
+                                 .def temp =r16
+                                 .def row =r17
+                                 .def col =r18
+                                 .def mask =r19
+                                 .def temp2 =r20
+                                 .equ PORTLDIR = 0xF0
+                                 .equ INITCOLMASK = 0xEF
+                                 .equ INITROWMASK = 0x01
+                                 .equ ROWMASK = 0x0F
                                  
                                  .macro do_lcd_command
                                  	ldi r16, @0
@@ -1925,153 +1915,195 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm(11): Inc
                                  	rcall lcd_wait
                                  .endmacro
                                  .macro display
-                                     ldi r20, 48
-                                     add r16, r20
                                  	rcall lcd_data
                                  	rcall lcd_wait
                                  .endmacro
                                  
-                                 .dseg
-000200                           SecondCounter: .byte 2 ; two-byte counter for counting seconds.
-000202                           TempCounter: .byte 2 ; temporary counter used to determine if one second has passed
                                  .cseg
-                                 .org 0x0000
-                                 	
-000000 940c 0033                 jmp RESET
-000002 940c 0032                 jmp DEFAULT ; no handling for IRQ0.
-000004 940c 0032                 jmp DEFAULT ; no handling for IRQ1.
-                                 .org OVF0addr ; OVF0addr is the address of Timer0 Overflow Interrupt Vector
-00002e 940c 0042                 jmp Timer0OVF ; jump to the interrupt handler for Timer0 overflow.
-000030 940c 0032                 jmp DEFAULT ; default service for all other interrupts.
-000032 9518                      DEFAULT: reti ; no interrupt handling 
+000000 940c 0072                 jmp RESET
                                  
+                                 .org 0x72
                                  RESET:
-000033 e020                          ldi secd_1, 0
-000034 e070                      	ldi secd_0, 0
-000035 e010                          ldi mins_1, 0
-000036 e060                      	ldi mins_0, 0
-000037 ef0f                      	ldi r16, low(RAMEND)
-000038 bf0d                      	out SPL, r16
-000039 e201                      	ldi r16, high(RAMEND)
-00003a bf0e                      	out SPH, r16
+000072 e070                      ldi r23, 0
+000073 ef0f                      ldi temp, low(RAMEND)
+000074 bf0d                      out SPL, temp
+000075 e201                      ldi temp, high(RAMEND)
+000076 bf0e                      out SPH, temp
+000077 ef00                      ldi temp, PORTLDIR ; columns are outputs, rows are inputs
+000078 9300 010a                 STS DDRL, temp     ; cannot use out
+00007a ef0f                      ser r16
+00007b bb00                      out DDRF, r16
+00007c b901                      out DDRA, r16
+00007d 2700                      clr r16
+00007e bb01                      out PORTF, r16
+00007f b902                      out PORTA, r16
+000080 e308
+000081 d08a
+000082 d0a3                      do_lcd_command 0b00111000 ; 2x5x7
+000083 d0be                      rcall sleep_5ms
+000084 e308
+000085 d086
+000086 d09f                      do_lcd_command 0b00111000 ; 2x5x7
+000087 d0b1                      rcall sleep_1ms
+000088 e308
+000089 d082
+00008a d09b                      do_lcd_command 0b00111000 ; 2x5x7
+00008b e308
+00008c d07f
+00008d d098                      do_lcd_command 0b00111000 ; 2x5x7
+00008e e008
+00008f d07c
+000090 d095                      do_lcd_command 0b00001000 ; display off?
+000091 e001
+000092 d079
+000093 d092                      do_lcd_command 0b00000001 ; clear display
+000094 e006
+000095 d076
+000096 d08f                      do_lcd_command 0b00000110 ; increment, no display shift
+000097 e00e
+000098 d073
+000099 d08c                      do_lcd_command 0b00001110 ; Cursor on, bar, no blink
+                                 /*ser temp
+                                 out DDRC, temp ; Make PORTC all outputs
+                                 out PORTC, temp ; Turn on all the LEDs*/
+                                 ; main keeps scanning the keypad to find which key is pressed.
+                                 main:
+00009a ee3f                      ldi mask, INITCOLMASK ; initial column mask
+00009b 2722                      clr col ; initial column
+                                 colloop:
+00009c 9330 010b                 STS PORTL, mask ; set column to mask value
+                                 ; (sets column 0 off)
+00009e ef0f                      ldi temp, 0xFF ; implement a delay so the
+                                 ; hardware can stabilize
+                                 delay:
+00009f 950a                      dec temp
+0000a0 f7f1                      brne delay
+0000a1 9100 0109                 LDS temp, PINL ; read PORTL. Cannot use in 
+0000a3 700f                      andi temp, ROWMASK ; read only the row bits
+0000a4 300f                      cpi temp, 0xF ; check if any rows are grounded
+0000a5 f061                      breq nextcol ; if not go to the next column
+0000a6 e031                      ldi mask, INITROWMASK ; initialise row check
+0000a7 2711                      clr row ; initial row
+                                 rowloop:      
+0000a8 2f40                      mov temp2, temp
+0000a9 2343                      and temp2, mask ; check masked bit
+0000aa f419                      brne skipconv ; if the result is non-zero,
+                                 ; we need to look again
+0000ab d00d                      rcall convert ; if bit is clear, convert the bitcode
+0000ac 940c 009a                 jmp main ; and start again
+                                 skipconv:
+0000ae 9513                      inc row ; else move to the next row
+0000af 0f33                      lsl mask ; shift the mask to the next bit
+0000b0 940c 00a8                 jmp rowloop          
+                                 nextcol:     
+0000b2 3023                      cpi col, 3 ; check if we^Òre on the last column
+0000b3 f331                      breq main ; if so, no buttons were pushed,
+                                 ; so start again.
+0000b4 9408                      sec ; else shift the column mask:
+                                 ; We must set the carry bit
+0000b5 1f33                      rol mask ; and then rotate left by a bit,
+                                 ; shifting the carry into
+                                 ; bit zero. We need this to make
+                                 ; sure all the rows have
+                                 ; pull-up resistors
+0000b6 9523                      inc col ; increment column value
+0000b7 940c 009c                 jmp colloop ; and check the next column
                                  
-00003b ef0f                      	ser r16
-00003c bb00                      	out DDRF, r16
-00003d b901                      	out DDRA, r16
-00003e 2700                      	clr r16
-00003f bb01                      	out PORTF, r16
-000040 b902                      	out PORTA, r16
                                  
-000041 c0a4                       rjmp main ; jump to main program
-                                 	
                                  
-                                 Timer0OVF: ; interrupt subroutine to Timer0
-000042 b75f                       in temp, SREG
-000043 935f                       push temp ; prologue starts
-000044 93df                       push YH ; save all conflicting registers in the prologue
-000045 93cf                       push YL
-000046 939f                       push r25
-000047 938f                       push r24 ; prologue ends
-                                  ; Load the value of the temporary counter
-000048 9180 0202                  lds r24, TempCounter
-00004a 9190 0203                  lds r25, TempCounter+1
-00004c 9601                       adiw r25:r24, 1 ; increase the temporary counter by one
-00004d 3884                       cpi r24, low(7812) ; check if (r25:r24) = 7812
-00004e e15e                       ldi temp, high(7812) ; 7812 = 106/128
-00004f 0795                       cpc r25, temp
-000050 f409                       brne NotSecond
-                                  
-000051 c00b                       rjmp end_calculation;calculate_value
-                                 
-                                  NotSecond: ; store the new value of the temporary counter
-000052 9380 0202                  sts TempCounter, r24
-000054 9390 0203                  sts TempCounter+1, r25
-                                 
-000056 918f                       EndIF: pop r24 ; epilogue starts
-000057 919f                       pop r25 ; restore all conflicting registers from the stack
-000058 91cf                       pop YL
-000059 91df                       pop YH
-00005a 915f                       pop temp
-00005b bf5f                       out SREG, temp
-00005c 9518                       reti ; return from the interrupt
-                                 
-                                  end_calculation:
-00005d e308
-00005e d04b
-00005f d064                          do_lcd_command 0b00111000 ; 2x5x7
-000060 d07f                      	rcall sleep_5ms
-000061 e308
-000062 d047
-000063 d060                      	do_lcd_command 0b00111000 ; 2x5x7
-000064 d072                      	rcall sleep_1ms
-000065 e308
-000066 d043
-000067 d05c                      	do_lcd_command 0b00111000 ; 2x5x7
-000068 e308
-000069 d040
-00006a d059                      	do_lcd_command 0b00111000 ; 2x5x7
-00006b e008
-00006c d03d
-00006d d056                      	do_lcd_command 0b00001000 ; display off?
-00006e e001
-00006f d03a
-000070 d053                      	do_lcd_command 0b00000001 ; clear display
-000071 e006
-000072 d037
-000073 d050                      	do_lcd_command 0b00000110 ; increment, no display shift
-000074 e00e
-000075 d034
-000076 d04d                      	do_lcd_command 0b00001110 ; Cursor on, bar, no blink
-000077 2f01                        mov r16, mins_1 
-000078 e340
-000079 0f04
-00007a d03a
-00007b d048                        display
-00007c 2f06                        mov r16, mins_0
-00007d e340
-00007e 0f04
-00007f d035
-000080 d043                        display
-000081 e30a
-000082 d032
-000083 d040                        do_lcd_data ':'
-000084 2f02                        mov r16, secd_1
-000085 e340
-000086 0f04
-000087 d02d
-000088 d03b                        display
-000089 2f07                        mov r16, secd_0
-00008a e340
-00008b 0f04
-00008c d028
-00008d d036                        display
-                                 
-00008e 9573                        inc secd_0
-00008f 307a                        cpi secd_0, 10
-000090 f451                        brne go_on
-000091 e070                        ldi secd_0, 0
-000092 9523                        inc secd_1
-000093 3026                        cpi secd_1, 6
-000094 f431                        brne go_on
-000095 e020                        ldi secd_1, 0
-000096 9563                        inc mins_0
-000097 306a                        cpi mins_0, 10
-000098 f411                        brne go_on
-000099 e060                        ldi mins_0, 0
-00009a 9513                        inc mins_1
-                                   go_on:
-00009b e0c2
-00009c e0d2
-00009d 2755
-00009e 9359
-00009f 8358                       clear TempCounter ; reset the temporary counter
-                                  ; Load the value of the second counter
-0000a0 9180 0200                  lds r24, SecondCounter
-0000a2 9190 0201                  lds r25, SecondCounter+1
-0000a4 9601                       adiw r25:r24, 1 ; increase the second counter by one
-0000a5 9380 0200                  sts SecondCounter, r24
-0000a7 9390 0201                  sts SecondCounter+1, r25
-0000a9 cfac                       rjmp EndIF
+                                 ; convert function converts the row and column given to a
+                                 ; binary number and also outputs the value to PORTC.
+                                 ; Inputs come from registers row and col and output is in
+                                 ; temp.
+                                 convert:
+0000b9 3170                      cpi r23, 16
+0000ba f4d9                      brne go_on
+0000bb 2777                      clr r23
+0000bc e308
+0000bd d04e
+0000be d067                      do_lcd_command 0b00111000 ; 2x5x7
+0000bf d082                      rcall sleep_5ms
+0000c0 e308
+0000c1 d04a
+0000c2 d063                      do_lcd_command 0b00111000 ; 2x5x7
+0000c3 d075                      rcall sleep_1ms
+0000c4 e308
+0000c5 d046
+0000c6 d05f                      do_lcd_command 0b00111000 ; 2x5x7
+0000c7 e308
+0000c8 d043
+0000c9 d05c                      do_lcd_command 0b00111000 ; 2x5x7
+0000ca e008
+0000cb d040
+0000cc d059                      do_lcd_command 0b00001000 ; display off?
+0000cd e001
+0000ce d03d
+0000cf d056                      do_lcd_command 0b00000001 ; clear display
+0000d0 e006
+0000d1 d03a
+0000d2 d053                      do_lcd_command 0b00000110 ; increment, no display shift
+0000d3 e00e
+0000d4 d037
+0000d5 d050                      do_lcd_command 0b00001110 ; Cursor on, bar, no blink
+                                 go_on:
+0000d6 3023                      cpi col, 3 ; if column is 3 we have a letter
+0000d7 f069                      breq letters
+0000d8 3013                      cpi row, 3 ; if row is 3 we have a symbol or 0
+0000d9 f099                      breq symbols
+0000da 2f01                      mov temp, row ; otherwise we have a number (1-9)
+0000db 0f00                      lsl temp ; temp = row * 2
+0000dc 0f01                      add temp, row ; temp = row * 3
+0000dd 0f02                      add temp, col ; add the column address
+                                 ; to get the offset from 1
+0000de 9503                      inc temp ; add 1. Value of switch is
+                                 ; row*3 + col + 1.
+0000df e360                      ldi r22, 48
+0000e0 0f06                      add r16, r22
+0000e1 d035
+0000e2 d043                      display
+0000e3 940c 00fe                 jmp convert_end
+                                 letters:
+0000e5 e00a                      ldi temp, 0xA
+0000e6 0f01                      add temp, row ; increment from 0xA by the row value
+0000e7 e367                      ldi r22, 55 ;65-10
+0000e8 0f06                      add temp, r22
+0000e9 d02d
+0000ea d03b                      display
+0000eb 940c 00fe                 jmp convert_end
+                                 symbols:
+0000ed 3020                      cpi col, 0 ; check if we have a star
+0000ee f039                      breq star
+0000ef 3021                      cpi col, 1 ; or if we have zero
+0000f0 f051                      breq zero
+0000f1 e203
+0000f2 d024
+0000f3 d032                      do_lcd_data '#'
+0000f4 940c 00fe                 jmp convert_end
+                                 star:
+0000f6 e20a
+0000f7 d01f
+0000f8 d02d                      do_lcd_data '*'
+0000f9 940c 00fe                 jmp convert_end
+                                 zero:
+0000fb e300                      ldi temp, 48 
+0000fc d01a
+0000fd d028                      display
+                                 convert_end:
+0000fe 9573                      inc r23
+0000ff e0d1                      ldi r29, 1
+000100 e050                      ldi r21, 0
+000101 eca0                      ldi r26, 0xC0
+000102 e2b7                      ldi r27, 0x27
+000103 e0c9                      ldi r28, 0x09
+                                 delay_in:
+000104 1bad                      sub r26, r29
+000105 0bb5                      sbc r27, r21
+000106 0bc5                      sbc r28, r21
+000107 17a5                      cp r26, r21
+000108 07b5                      cpc r27, r21
+000109 07c5                      cpc r28, r21 
+00010a f7c9                      brne delay_in
+00010b 9508                      ret ; return to caller
                                  
                                  
                                  .equ LCD_RS = 7
@@ -2091,101 +2123,79 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm(11): Inc
                                  ;
                                  
                                  lcd_command:
-0000aa bb01                      	out PORTF, r16
-0000ab 0000                      	nop
-0000ac 9a16                      	lcd_set LCD_E
-0000ad 0000                      	nop
-0000ae 0000                      	nop
-0000af 0000                      	nop
-0000b0 9816                      	lcd_clr LCD_E
-0000b1 0000                      	nop
-0000b2 0000                      	nop
-0000b3 0000                      	nop
-0000b4 9508                      	ret
+00010c bb01                      	out PORTF, r16
+00010d 0000                      	nop
+00010e 9a16                      	lcd_set LCD_E
+00010f 0000                      	nop
+000110 0000                      	nop
+000111 0000                      	nop
+000112 9816                      	lcd_clr LCD_E
+000113 0000                      	nop
+000114 0000                      	nop
+000115 0000                      	nop
+000116 9508                      	ret
                                  
                                  lcd_data:
-0000b5 bb01                      	out PORTF, r16
-0000b6 9a17                      	lcd_set LCD_RS
-0000b7 0000                      	nop
-0000b8 0000                      	nop
-0000b9 0000                      	nop
-0000ba 9a16                      	lcd_set LCD_E
-0000bb 0000                      	nop
-0000bc 0000                      	nop
-0000bd 0000                      	nop
-0000be 9816                      	lcd_clr LCD_E
-0000bf 0000                      	nop
-0000c0 0000                      	nop
-0000c1 0000                      	nop
-0000c2 9817                      	lcd_clr LCD_RS
-0000c3 9508                      	ret
+000117 bb01                      	out PORTF, r16
+000118 9a17                      	lcd_set LCD_RS
+000119 0000                      	nop
+00011a 0000                      	nop
+00011b 0000                      	nop
+00011c 9a16                      	lcd_set LCD_E
+00011d 0000                      	nop
+00011e 0000                      	nop
+00011f 0000                      	nop
+000120 9816                      	lcd_clr LCD_E
+000121 0000                      	nop
+000122 0000                      	nop
+000123 0000                      	nop
+000124 9817                      	lcd_clr LCD_RS
+000125 9508                      	ret
                                  
                                  lcd_wait:
-0000c4 930f                      	push r16
-0000c5 2700                      	clr r16
-0000c6 bb00                      	out DDRF, r16
-0000c7 bb01                      	out PORTF, r16
-0000c8 9a15                      	lcd_set LCD_RW
+000126 930f                      	push r16
+000127 2700                      	clr r16
+000128 bb00                      	out DDRF, r16
+000129 bb01                      	out PORTF, r16
+00012a 9a15                      	lcd_set LCD_RW
                                  lcd_wait_loop:
-0000c9 0000                      	nop
-0000ca 9a16                      	lcd_set LCD_E
-0000cb 0000                      	nop
-0000cc 0000                      	nop
-0000cd 0000                          nop
-0000ce b10f                      	in r16, PINF
-0000cf 9816                      	lcd_clr LCD_E
-0000d0 fd07                      	sbrc r16, 7
-0000d1 cff7                      	rjmp lcd_wait_loop
-0000d2 9815                      	lcd_clr LCD_RW
-0000d3 ef0f                      	ser r16
-0000d4 bb00                      	out DDRF, r16
-0000d5 910f                      	pop r16
-0000d6 9508                      	ret
+00012b 0000                      	nop
+00012c 9a16                      	lcd_set LCD_E
+00012d 0000                      	nop
+00012e 0000                      	nop
+00012f 0000                          nop
+000130 b10f                      	in r16, PINF
+000131 9816                      	lcd_clr LCD_E
+000132 fd07                      	sbrc r16, 7
+000133 cff7                      	rjmp lcd_wait_loop
+000134 9815                      	lcd_clr LCD_RW
+000135 ef0f                      	ser r16
+000136 bb00                      	out DDRF, r16
+000137 910f                      	pop r16
+000138 9508                      	ret
                                  
                                  .equ F_CPU = 16000000
                                  .equ DELAY_1MS = F_CPU / 4 / 1000 - 4
                                  ; 4 cycles per iteration - setup/call-return overhead
                                  
                                  sleep_1ms:
-0000d7 938f                      	push r24
-0000d8 939f                      	push r25
-0000d9 e09f                      	ldi r25, high(DELAY_1MS)
-0000da e98c                      	ldi r24, low(DELAY_1MS)
+000139 938f                      	push r24
+00013a 939f                      	push r25
+00013b e09f                      	ldi r25, high(DELAY_1MS)
+00013c e98c                      	ldi r24, low(DELAY_1MS)
                                  delayloop_1ms:
-0000db 9701                      	sbiw r25:r24, 1
-0000dc f7f1                      	brne delayloop_1ms
-0000dd 919f                      	pop r25
-0000de 918f                      	pop r24
-0000df 9508                      	ret
+00013d 9701                      	sbiw r25:r24, 1
+00013e f7f1                      	brne delayloop_1ms
+00013f 919f                      	pop r25
+000140 918f                      	pop r24
+000141 9508                      	ret
                                  
                                  sleep_5ms:
-0000e0 dff6                      	rcall sleep_1ms
-0000e1 dff5                      	rcall sleep_1ms
-0000e2 dff4                      	rcall sleep_1ms
-0000e3 dff3                      	rcall sleep_1ms
-0000e4 dff2                      	rcall sleep_1ms
-0000e5 9508                      	ret
-                                 
-                                 
-                                  main: 
-0000e6 e0c2
-0000e7 e0d2
-0000e8 2755
-0000e9 9359
-0000ea 8358                       clear TempCounter ; initialize the temporary counter to 0
-0000eb e0c0
-0000ec e0d2
-0000ed 2755
-0000ee 9359
-0000ef 8358                       clear SecondCounter ; initialize the second counter to 0
-0000f0 e050                       ldi temp, 0b00000000
-0000f1 bd54                       out TCCR0A, temp
-0000f2 e052                       ldi temp, 0b00000010
-0000f3 bd55                       out TCCR0B, temp ; set prescalar value to 8
-0000f4 e051                       ldi temp, 1<<TOIE0 ; TOIE0 is the bit number of TOIE0 which is 0
-0000f5 9350 006e                  sts TIMSK0, temp ; enable Timer0 Overflow Interrupt
-0000f7 9478                       sei ; enable global interrupt
-                                  end_loop: 
+000142 dff6                      	rcall sleep_1ms
+000143 dff5                      	rcall sleep_1ms
+000144 dff4                      	rcall sleep_1ms
+000145 dff3                      	rcall sleep_1ms
+000146 dff2                      	rcall sleep_1ms
 
 
 RESOURCE USE INFORMATION
@@ -2203,41 +2213,41 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega2560" register use summary:
-x  :   0 y  :   6 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
+x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  38 r17:   3 r18:   5 r19:   0 r20:   8 
-r21:  21 r22:   5 r23:   5 r24:  13 r25:  13 r26:   0 r27:   0 r28:   5 
-r29:   5 r30:   0 r31:   0 
-Registers used: 12 out of 35 (34.3%)
+r13:   0 r14:   0 r15:   0 r16:  57 r17:   6 r18:   7 r19:   6 r20:   2 
+r21:   6 r22:   4 r23:   4 r24:   4 r25:   4 r26:   3 r27:   3 r28:   3 
+r29:   2 r30:   0 r31:   0 
+Registers used: 14 out of 35 (40.0%)
 
 "ATmega2560" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   0 add   :   4 adiw  :   2 and   :   0 
-andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
+.lds  :   0 .sts  :   0 adc   :   0 add   :   5 adiw  :   0 and   :   1 
+andi  :   1 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   6 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   5 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   5 cbr   :   0 
 clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   5 cls   :   0 
-clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   1 
-cpi   :   4 cpse  :   0 dec   :   0 eicall:   0 eijmp :   0 elpm  :   0 
+clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   1 cpc   :   2 
+cpi   :   7 cpse  :   0 dec   :   1 eicall:   0 eijmp :   0 elpm  :   0 
 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 
-in    :   2 inc   :   4 jmp   :   5 ld    :   0 ldd   :   0 ldi   :  34 
-lds   :   4 lpm   :   0 lsl   :   0 lsr   :   0 mov   :   4 movw  :   0 
+in    :   1 inc   :   4 jmp   :   8 ld    :   0 ldd   :   0 ldi   :  36 
+lds   :   1 lpm   :   0 lsl   :   2 lsr   :   0 mov   :   2 movw  :   0 
 mul   :   0 muls  :   0 mulsu :   0 neg   :   0 nop   :  20 or    :   0 
-ori   :   0 out   :  14 pop   :   8 push  :   8 rcall :  33 ret   :   5 
-reti  :   2 rjmp  :   5 rol   :   0 ror   :   0 sbc   :   0 sbci  :   0 
+ori   :   0 out   :  11 pop   :   3 push  :   3 rcall :  52 ret   :   6 
+reti  :   0 rjmp  :   1 rol   :   1 ror   :   0 sbc   :   2 sbci  :   0 
 sbi   :   5 sbic  :   0 sbis  :   0 sbiw  :   1 sbr   :   0 sbrc  :   1 
-sbrs  :   0 sec   :   0 seh   :   0 sei   :   1 sen   :   0 ser   :   2 
+sbrs  :   0 sec   :   1 seh   :   0 sei   :   0 sen   :   0 ser   :   2 
 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 spm   :   0 
-st    :   6 std   :   0 sts   :   5 sub   :   0 subi  :   0 swap  :   0 
+st    :   0 std   :   0 sts   :   2 sub   :   1 subi  :   0 swap  :   0 
 tst   :   0 wdr   :   0 
-Instructions used: 28 out of 116 (24.1%)
+Instructions used: 34 out of 116 (29.3%)
 
 "ATmega2560" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0001f2    418      0    418  262144   0.2%
-[.dseg] 0x000200 0x000204      0      4      4    8192   0.0%
+[.cseg] 0x000000 0x000290    432      0    432  262144   0.2%
+[.dseg] 0x000200 0x000200      0      0      0    8192   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 
 Assembly complete, 0 errors, 0 warnings
