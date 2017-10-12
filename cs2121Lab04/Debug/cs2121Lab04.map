@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\led\TaskD.asm Fri Oct 06 16:44:31 2017
+AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab04\TaskA.asm Thu Oct 12 22:47:20 2017
 
 
 EQU  SIGNATURE_000 0000001e
@@ -1359,22 +1359,35 @@ EQU  URXC3addr    0000006c
 EQU  UDRE3addr    0000006e
 EQU  UTXC3addr    00000070
 EQU  INT_VECTORS_SIZE 00000072
-DEF  temp         r16
 EQU  PATTERN      000000f0
-DEF  leds         r20
-DEF  mins         r17
-DEF  secd         r18
+DEF  temp         r21
+DEF  mins_1       r17
+DEF  mins_0       r22
+DEF  secd_1       r18
+DEF  secd_0       r23
 DEF  mask         r19
 EQU  START_TIME   00000000
 DSEG SecondCounter 00000200
 DSEG TempCounter  00000202
 CSEG RESET        00000033
 CSEG DEFAULT      00000032
-CSEG Timer0OVF    0000003c
-CSEG main         0000009d
-CSEG NotSecond    00000061
-CSEG calculate_value 0000006c
-CSEG end_calculation 0000004c
-CSEG continue     00000052
-CSEG EndIF        00000065
-CSEG end_loop     000000b2
+CSEG Timer0OVF    00000042
+CSEG main         000000e6
+CSEG NotSecond    00000052
+CSEG end_calculation 0000005d
+CSEG EndIF        00000056
+CSEG lcd_command  000000aa
+CSEG lcd_wait     000000c4
+CSEG sleep_5ms    000000e0
+CSEG sleep_1ms    000000d7
+CSEG lcd_data     000000b5
+CSEG go_on        0000009b
+EQU  LCD_RS       00000007
+EQU  LCD_E        00000006
+EQU  LCD_RW       00000005
+EQU  LCD_BE       00000004
+CSEG lcd_wait_loop 000000c9
+EQU  F_CPU        00f42400
+EQU  DELAY_1MS    00000f9c
+CSEG delayloop_1ms 000000db
+CSEG end_loop     000000f8
