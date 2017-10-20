@@ -75,6 +75,9 @@ ldi temp, low(RAMEND)
 out SPL, temp
 /*ser temp ; set Port C as output
 out DDRC, temp*/
+clr r16
+out DDRD, r16
+out PORTD, temp
 ldi temp, (2 << ISC20) 
 sts EICRA, temp
 in temp, EIMSK
