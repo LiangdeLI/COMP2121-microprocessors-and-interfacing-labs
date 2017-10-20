@@ -2,7 +2,7 @@
 ; cs2121Lab05.asm
 ;
 ; Created: 19/10/2017 9:32:37 PM
-; Author : State.Gamepad.sThumbRX
+; Author : Liangde Li z5077896 Dankoon Yoo z5116090
 ;
 
 .include "m2560def.inc"
