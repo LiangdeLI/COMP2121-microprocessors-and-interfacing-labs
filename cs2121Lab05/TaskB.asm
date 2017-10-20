@@ -9,7 +9,7 @@
 
 .def temp = r16
 .def temp1 = r17
-.def flag = r24
+.def flag = r18
 .def holes = r20
 
 
@@ -34,10 +34,8 @@
 .endmacro
                         
 .dseg
-SecondCounter:
-   .byte 2              ; Two-byte counter for counting seconds.
-TempCounter:
-   .byte 2              ; Temporary counter. Used to determine 
+SecondCounter: .byte 2  ; Two-byte counter for counting seconds.
+TempCounter: .byte 2    ; Temporary counter. Used to determine 
                         ; if one second has passed
 RevCounter: .byte 2 ; revolution counter
 TargetSpeed: .byte 1
@@ -64,12 +62,12 @@ out SPL, temp
 ldi temp, high(RAMEND)
 out SPH, temp
 ser r16
+out DDRE, r16
 out DDRF, r16
 out DDRA, r16
 clr r16
 out PORTF, r16
 out PORTA, r16
-
 clr temp
 out DDRD, temp
 out PORTD, temp
@@ -119,16 +117,19 @@ END_BUTTON_ZERO:
 sts TargetSpeed, temp
 ldi r23, 1
 clr r21
-ldi r18, 0xDB  
-ldi r19, 0x7C
-ldi r20, 0x03
+ldi temp, 0xDB
+mov r8, temp  
+ldi temp, 0x7C
+mov r9, temp
+ldi temp, 0x03
+mov r10, temp
 delay1:
-sub r18, r23
-sbc r19, r21
-sbc r20, r21
-cp r18, r21
-cpc r19, r21
-cpc r20, r21
+sub r8, r23
+sbc r9, r21
+sbc r10, r21
+cp r8, r21
+cpc r9, r21
+cpc r10, r21
 brne delay1
 pop temp
 out SREG, temp
@@ -157,16 +158,21 @@ ldi temp1, 20
 sub temp, temp1
 END_BUTTON_ONE:
 sts TargetSpeed, temp
-ldi r18, 0xDB   
-ldi r19, 0x7C
-ldi r20, 0x03
+ldi r23, 1
+clr r21
+ldi temp, 0xDB
+mov r8, temp  
+ldi temp, 0x7C
+mov r9, temp
+ldi temp, 0x03
+mov r10, temp
 delay2:
-sub r18, r23
-sbc r19, r21
-sbc r20, r21
-cp r18, r21
-cpc r19, r21
-cpc r20, r21
+sub r8, r23
+sbc r9, r21
+sbc r10, r21
+cp r8, r21
+cpc r9, r21
+cpc r10, r21
 brne delay2
 pop temp
 out SREG, temp

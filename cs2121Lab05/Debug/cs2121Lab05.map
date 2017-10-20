@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm Fri Oct 20 15:58:03 2017
+AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm Fri Oct 20 16:14:52 2017
 
 
 EQU  SIGNATURE_000 0000001e
@@ -1361,41 +1361,41 @@ EQU  UTXC3addr    00000070
 EQU  INT_VECTORS_SIZE 00000072
 DEF  temp         r16
 DEF  temp1        r17
-DEF  flag         r24
+DEF  flag         r18
 DEF  holes        r20
 DSEG SecondCounter 00000200
 DSEG TempCounter  00000202
 DSEG RevCounter   00000204
 DSEG TargetSpeed  00000206
 CSEG RESET        00000033
-CSEG EXT_INT0     00000058
-CSEG EXT_INT1     0000007b
-CSEG EXT_INT2     0000009c
-CSEG Timer0OVF    000000b7
+CSEG EXT_INT0     00000059
+CSEG EXT_INT1     0000007f
+CSEG EXT_INT2     000000a5
+CSEG Timer0OVF    000000c0
 CSEG DEFAULT      00000032
-CSEG main         0000010f
-CSEG real_int0    00000062
-CSEG END_BUTTON_ZERO 00000069
-CSEG delay1       00000070
-CSEG real_int1    00000085
-CSEG END_BUTTON_ONE 0000008c
-CSEG delay2       00000091
-CSEG end          000000b1
-CSEG NotSecond    00000104
-CSEG one_tenth_second 000000c6
-CSEG less         000000e3
-CSEG EndIF        00000108
-CSEG loop         00000118
+CSEG main         00000118
+CSEG real_int0    00000063
+CSEG END_BUTTON_ZERO 0000006a
+CSEG delay1       00000074
+CSEG real_int1    00000089
+CSEG END_BUTTON_ONE 00000090
+CSEG delay2       0000009a
+CSEG end          000000ba
+CSEG NotSecond    0000010d
+CSEG one_tenth_second 000000cf
+CSEG less         000000ec
+CSEG EndIF        00000111
+CSEG loop         00000121
 EQU  LCD_RS       00000007
 EQU  LCD_E        00000006
 EQU  LCD_RW       00000005
 EQU  LCD_BE       00000004
-CSEG lcd_command  00000119
-CSEG lcd_data     00000124
-CSEG lcd_wait     00000133
-CSEG lcd_wait_loop 00000138
+CSEG lcd_command  00000122
+CSEG lcd_data     0000012d
+CSEG lcd_wait     0000013c
+CSEG lcd_wait_loop 00000141
 EQU  F_CPU        00f42400
 EQU  DELAY_1MS    00000f9c
-CSEG sleep_1ms    00000146
-CSEG delayloop_1ms 0000014a
-CSEG sleep_5ms    0000014f
+CSEG sleep_1ms    0000014f
+CSEG delayloop_1ms 00000153
+CSEG sleep_5ms    00000158

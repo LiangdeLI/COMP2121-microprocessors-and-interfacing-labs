@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm Fri Oct 20 15:58:03 2017
+AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm Fri Oct 20 16:14:52 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
 C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
@@ -1897,7 +1897,7 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Incl
                                  
                                  .def temp = r16
                                  .def temp1 = r17
-                                 .def flag = r24
+                                 .def flag = r18
                                  .def holes = r20
                                  
                                  
@@ -1922,10 +1922,8 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Incl
                                  .endmacro
                                                          
                                  .dseg
-                                 SecondCounter:
-000200                              .byte 2              ; Two-byte counter for counting seconds.
-                                 TempCounter:
-000202                              .byte 2              ; Temporary counter. Used to determine 
+000200                           SecondCounter: .byte 2  ; Two-byte counter for counting seconds.
+000202                           TempCounter: .byte 2    ; Temporary counter. Used to determine 
                                                          ; if one second has passed
 000204                           RevCounter: .byte 2 ; revolution counter
 000206                           TargetSpeed: .byte 1
@@ -1934,13 +1932,13 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Incl
                                  .org 0x0000
 000000 940c 0033                 jmp RESET
                                  .org INT0addr ; INT0addr is the address of EXT_INT0
-000002 940c 0058                 jmp EXT_INT0
+000002 940c 0059                 jmp EXT_INT0
                                  .org INT1addr ; INT1addr is the address of EXT_INT1
-000004 940c 007b                 jmp EXT_INT1
+000004 940c 007f                 jmp EXT_INT1
                                  .org INT2addr ; 
-000006 940c 009c                 jmp EXT_INT2
+000006 940c 00a5                 jmp EXT_INT2
                                  .org OVF0addr
-00002e 940c 00b7                 jmp Timer0OVF ; Jump to the interrupt handler for
+00002e 940c 00c0                 jmp Timer0OVF ; Jump to the interrupt handler for
                                                          ; Timer3 overflow.
 000030 940c 0032                 jmp DEFAULT          ; default service for all other interrupts.
 000032 9518                      DEFAULT:  reti          ; no service
@@ -1952,235 +1950,243 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Incl
 000035 e201                      ldi temp, high(RAMEND)
 000036 bf0e                      out SPH, temp
 000037 ef0f                      ser r16
-000038 bb00                      out DDRF, r16
-000039 b901                      out DDRA, r16
-00003a 2700                      clr r16
-00003b bb01                      out PORTF, r16
-00003c b902                      out PORTA, r16
+000038 b90d                      out DDRE, r16
+000039 bb00                      out DDRF, r16
+00003a b901                      out DDRA, r16
+00003b 2700                      clr r16
+00003c bb01                      out PORTF, r16
+00003d b902                      out PORTA, r16
+00003e 2700                      clr temp
+00003f b90a                      out DDRD, temp
+000040 b90b                      out PORTD, temp
+000041 e20a                      ldi temp, (2 << ISC20) | (2 << ISC10) | (2 << ISC00)
+000042 9300 0069                 sts EICRA, temp
+000044 b30d                      in temp, EIMSK
+000045 6007                      ori temp, (1<<INT2) | (1<<INT0) | (1<<INT1)
+000046 bb0d                      out EIMSK, temp
                                  
-00003d 2700                      clr temp
-00003e b90a                      out DDRD, temp
-00003f b90b                      out PORTD, temp
-000040 e20a                      ldi temp, (2 << ISC20) | (2 << ISC10) | (2 << ISC00)
-000041 9300 0069                 sts EICRA, temp
-000043 b30d                      in temp, EIMSK
-000044 6007                      ori temp, (1<<INT2) | (1<<INT0) | (1<<INT1)
-000045 bb0d                      out EIMSK, temp
                                  
+000047 e010                      ldi temp1, 0 					
+000048 9310 009b                 sts OCR3BH, temp1
+00004a e010                      ldi temp1, 0
+00004b 9310 009a                 sts OCR3BL, temp1
+00004d e010                      ldi temp1, 0
+00004e 9310 0206                 sts TargetSpeed, temp1
                                  
-000046 e010                      ldi temp1, 0 					
-000047 9310 009b                 sts OCR3BH, temp1
-000049 e010                      ldi temp1, 0
-00004a 9310 009a                 sts OCR3BL, temp1
-00004c e010                      ldi temp1, 0
-00004d 9310 0206                 sts TargetSpeed, temp1
+000050 e011                      ldi temp1, (1 << CS30) 		; set the Timer3 to Phase Correct PWM mode. 
+000051 9310 0091                 sts TCCR3B, temp1
+000053 e211                      ldi temp1, (1<< WGM30)|(1<<COM3B1)
+000054 9310 0090                 sts TCCR3A, temp1
                                  
-00004f e011                      ldi temp1, (1 << CS30) 		; set the Timer3 to Phase Correct PWM mode. 
-000050 9310 0091                 sts TCCR3B, temp1
-000052 e211                      ldi temp1, (1<< WGM30)|(1<<COM3B1)
-000053 9310 0090                 sts TCCR3A, temp1
-                                 
-000055 9478                      sei
-000056 940c 010f                 jmp main
+000056 9478                      sei
+000057 940c 0118                 jmp main
                                  
                                  
                                  
                                  EXT_INT0:
-000058 930f                      push temp
-000059 b70f                      in temp, SREG
-00005a 930f                      push temp
-00005b 3081                      cpi flag, 1
-00005c f429                      brne real_int0
-00005d 2788                      clr flag
-00005e 910f                      pop temp
-00005f bf0f                      out SREG, temp
-000060 910f                      pop temp
-000061 9518                      reti
+000059 930f                      push temp
+00005a b70f                      in temp, SREG
+00005b 930f                      push temp
+00005c 3021                      cpi flag, 1
+00005d f429                      brne real_int0
+00005e 2722                      clr flag
+00005f 910f                      pop temp
+000060 bf0f                      out SREG, temp
+000061 910f                      pop temp
+000062 9518                      reti
                                  real_int0:
-000062 e081                      ldi flag, 1
-000063 9100 0206                 lds temp, TargetSpeed
-000065 3604                      cpi temp, 100
-000066 f011                      breq END_BUTTON_ZERO
-000067 e114                      ldi temp1, 20
-000068 0f01                      add temp, temp1
+000063 e021                      ldi flag, 1
+000064 9100 0206                 lds temp, TargetSpeed
+000066 3604                      cpi temp, 100
+000067 f011                      breq END_BUTTON_ZERO
+000068 e114                      ldi temp1, 20
+000069 0f01                      add temp, temp1
                                  END_BUTTON_ZERO:
-000069 9300 0206                 sts TargetSpeed, temp
-00006b e071                      ldi r23, 1
-00006c 2755                      clr r21
-00006d ed2b                      ldi r18, 0xDB  
-00006e e73c                      ldi r19, 0x7C
-00006f e043                      ldi r20, 0x03
+00006a 9300 0206                 sts TargetSpeed, temp
+00006c e071                      ldi r23, 1
+00006d 2755                      clr r21
+00006e ed0b                      ldi temp, 0xDB
+00006f 2e80                      mov r8, temp  
+000070 e70c                      ldi temp, 0x7C
+000071 2e90                      mov r9, temp
+000072 e003                      ldi temp, 0x03
+000073 2ea0                      mov r10, temp
                                  delay1:
-000070 1b27                      sub r18, r23
-000071 0b35                      sbc r19, r21
-000072 0b45                      sbc r20, r21
-000073 1725                      cp r18, r21
-000074 0735                      cpc r19, r21
-000075 0745                      cpc r20, r21
-000076 f7c9                      brne delay1
-000077 910f                      pop temp
-000078 bf0f                      out SREG, temp
-000079 910f                      pop temp
-00007a 9518                      reti
+000074 1a87                      sub r8, r23
+000075 0a95                      sbc r9, r21
+000076 0aa5                      sbc r10, r21
+000077 1685                      cp r8, r21
+000078 0695                      cpc r9, r21
+000079 06a5                      cpc r10, r21
+00007a f7c9                      brne delay1
+00007b 910f                      pop temp
+00007c bf0f                      out SREG, temp
+00007d 910f                      pop temp
+00007e 9518                      reti
                                  
                                  
                                  
                                  EXT_INT1:
-00007b 930f                      push temp
-00007c b70f                      in temp, SREG
-00007d 930f                      push temp
-00007e 3081                      cpi flag, 1
-00007f f429                      brne real_int1
-000080 2788                      clr flag
-000081 910f                      pop temp
-000082 bf0f                      out SREG, temp
-000083 910f                      pop temp
-000084 9518                      reti
+00007f 930f                      push temp
+000080 b70f                      in temp, SREG
+000081 930f                      push temp
+000082 3021                      cpi flag, 1
+000083 f429                      brne real_int1
+000084 2722                      clr flag
+000085 910f                      pop temp
+000086 bf0f                      out SREG, temp
+000087 910f                      pop temp
+000088 9518                      reti
                                  real_int1:
-000085 e081                      ldi flag, 1
-000086 9100 0206                 lds temp, TargetSpeed
-000088 3000                      cpi temp, 0
-000089 f011                      breq END_BUTTON_ONE
-00008a e114                      ldi temp1, 20
-00008b 1b01                      sub temp, temp1
+000089 e021                      ldi flag, 1
+00008a 9100 0206                 lds temp, TargetSpeed
+00008c 3000                      cpi temp, 0
+00008d f011                      breq END_BUTTON_ONE
+00008e e114                      ldi temp1, 20
+00008f 1b01                      sub temp, temp1
                                  END_BUTTON_ONE:
-00008c 9300 0206                 sts TargetSpeed, temp
-00008e ed2b                      ldi r18, 0xDB   
-00008f e73c                      ldi r19, 0x7C
-000090 e043                      ldi r20, 0x03
+000090 9300 0206                 sts TargetSpeed, temp
+000092 e071                      ldi r23, 1
+000093 2755                      clr r21
+000094 ed0b                      ldi temp, 0xDB
+000095 2e80                      mov r8, temp  
+000096 e70c                      ldi temp, 0x7C
+000097 2e90                      mov r9, temp
+000098 e003                      ldi temp, 0x03
+000099 2ea0                      mov r10, temp
                                  delay2:
-000091 1b27                      sub r18, r23
-000092 0b35                      sbc r19, r21
-000093 0b45                      sbc r20, r21
-000094 1725                      cp r18, r21
-000095 0735                      cpc r19, r21
-000096 0745                      cpc r20, r21
-000097 f7c9                      brne delay2
-000098 910f                      pop temp
-000099 bf0f                      out SREG, temp
-00009a 910f                      pop temp
-00009b 9518                      reti
+00009a 1a87                      sub r8, r23
+00009b 0a95                      sbc r9, r21
+00009c 0aa5                      sbc r10, r21
+00009d 1685                      cp r8, r21
+00009e 0695                      cpc r9, r21
+00009f 06a5                      cpc r10, r21
+0000a0 f7c9                      brne delay2
+0000a1 910f                      pop temp
+0000a2 bf0f                      out SREG, temp
+0000a3 910f                      pop temp
+0000a4 9518                      reti
                                  
                                  
                                  
                                  EXT_INT2:
-00009c 930f                      push temp
-00009d b70f                      in temp, SREG
-00009e 930f                      push temp
-00009f 937f                      push r23
-0000a0 936f                      push r22
-0000a1 9543                      inc holes
-0000a2 3044                      cpi holes, 4
-0000a3 f469                      brne end
-0000a4 2744                      clr holes
-0000a5 9160 0204                 lds r22, RevCounter
-0000a7 9170 0205                 lds r23, RevCounter+1
-0000a9 e001                      ldi temp, 1
-0000aa 0f60                      add r22, temp
-0000ab e000                      ldi temp, 0
-0000ac 1f70                      adc r23, temp
-0000ad 9360 0204                 sts RevCounter, r22
-0000af 9370 0205                 sts RevCounter+1, r23
+0000a5 930f                      push temp
+0000a6 b70f                      in temp, SREG
+0000a7 930f                      push temp
+0000a8 937f                      push r23
+0000a9 936f                      push r22
+0000aa 9543                      inc holes
+0000ab 3044                      cpi holes, 4
+0000ac f469                      brne end
+0000ad 2744                      clr holes
+0000ae 9160 0204                 lds r22, RevCounter
+0000b0 9170 0205                 lds r23, RevCounter+1
+0000b2 e001                      ldi temp, 1
+0000b3 0f60                      add r22, temp
+0000b4 e000                      ldi temp, 0
+0000b5 1f70                      adc r23, temp
+0000b6 9360 0204                 sts RevCounter, r22
+0000b8 9370 0205                 sts RevCounter+1, r23
                                  end:
-0000b1 916f                      pop r22
-0000b2 917f                      pop r23
-0000b3 910f                      pop temp
-0000b4 bf0f                      out SREG, temp
-0000b5 910f                      pop temp
-0000b6 9518                      reti
+0000ba 916f                      pop r22
+0000bb 917f                      pop r23
+0000bc 910f                      pop temp
+0000bd bf0f                      out SREG, temp
+0000be 910f                      pop temp
+0000bf 9518                      reti
                                  
                                  
                                  
                                  Timer0OVF: ; interrupt subroutine to Timer0
-0000b7 b70f                      in temp, SREG
-0000b8 930f                      push temp ; prologue starts
-0000b9 93df                      push YH ; save all conflicting registers in the prologue
-0000ba 93cf                      push YL
-0000bb 939f                      push r25
-0000bc 938f                      push r24 ; prologue ends
+0000c0 b70f                      in temp, SREG
+0000c1 930f                      push temp ; prologue starts
+0000c2 93df                      push YH ; save all conflicting registers in the prologue
+0000c3 93cf                      push YL
+0000c4 939f                      push r25
+0000c5 938f                      push r24 ; prologue ends
                                  ; Load the value of the temporary counter
-0000bd 9180 0202                 lds r24, TempCounter
-0000bf 9190 0203                 lds r25, TempCounter+1
-0000c1 9601                      adiw r25:r24, 1 ; increase the temporary counter by one
-0000c2 308d                      cpi r24, low(781) ; check if (r25:r24) = 7812
-0000c3 e003                      ldi temp, high(781) ; 7812 = 10^6/128
-0000c4 0790                      cpc r25, temp
-0000c5 f5f1                      brne NotSecond
+0000c6 9180 0202                 lds r24, TempCounter
+0000c8 9190 0203                 lds r25, TempCounter+1
+0000ca 9601                      adiw r25:r24, 1 ; increase the temporary counter by one
+0000cb 308d                      cpi r24, low(781) ; check if (r25:r24) = 7812
+0000cc e003                      ldi temp, high(781) ; 7812 = 10^6/128
+0000cd 0790                      cpc r25, temp
+0000ce f5f1                      brne NotSecond
                                  
                                  one_tenth_second:
-0000c6 9160 0204                 lds r22, RevCounter
-0000c8 9170 0205                 lds r23, RevCounter+1
-0000ca e00a                      ldi temp, 10
-0000cb 9f60                      mul r22, temp
-0000cc 2d80                      mov r24, r0
-0000cd 2d91                      mov r25, r1
-0000ce 9f70                      mul r23, temp
-0000cf 0d80                      add r24, r0
-0000d0 1d91                      adc r25, r1
-0000d1 9160 0206                 lds r22, TargetSpeed
-0000d3 e070                      ldi r23, 0
-0000d4 1786                      cp r24, r22
-0000d5 0797                      cpc r25, r23
-0000d6 f060                      brlo less
-0000d7 9160 009a                 lds r22, OCR3BL
-0000d9 9170 009b                 lds r23, OCR3BH
-0000db e001                      ldi temp, 1
-0000dc e010                      ldi temp1, 0
-0000dd 1b60                      sub r22, temp
-0000de 0b71                      sbc r23, temp1
-0000df 9360 009a                 sts OCR3BL, r22
-0000e1 9370 009b                 sts OCR3BH, r23
+0000cf 9160 0204                 lds r22, RevCounter
+0000d1 9170 0205                 lds r23, RevCounter+1
+0000d3 e00a                      ldi temp, 10
+0000d4 9f60                      mul r22, temp
+0000d5 2d80                      mov r24, r0
+0000d6 2d91                      mov r25, r1
+0000d7 9f70                      mul r23, temp
+0000d8 0d80                      add r24, r0
+0000d9 1d91                      adc r25, r1
+0000da 9160 0206                 lds r22, TargetSpeed
+0000dc e070                      ldi r23, 0
+0000dd 1786                      cp r24, r22
+0000de 0797                      cpc r25, r23
+0000df f060                      brlo less
+0000e0 9160 009a                 lds r22, OCR3BL
+0000e2 9170 009b                 lds r23, OCR3BH
+0000e4 e001                      ldi temp, 1
+0000e5 e010                      ldi temp1, 0
+0000e6 1b60                      sub r22, temp
+0000e7 0b71                      sbc r23, temp1
+0000e8 9360 009a                 sts OCR3BL, r22
+0000ea 9370 009b                 sts OCR3BH, r23
                                  less:
-0000e3 9160 009a                 lds r22, OCR3BL
-0000e5 9170 009b                 lds r23, OCR3BH
-0000e7 e001                      ldi temp, 1
-0000e8 e010                      ldi temp1, 0
-0000e9 0f60                      add r22, temp
-0000ea 1f71                      adc r23, temp1
-0000eb 9360 009a                 sts OCR3BL, r22
-0000ed 9370 009b                 sts OCR3BH, r23
-0000ef e060                      ldi r22, 0
-0000f0 e070                      ldi r23, 0
-0000f1 9360 0204                 sts RevCounter, r22
-0000f3 9370 0205                 sts RevCounter+1, r23
-0000f5 e0c2
-0000f6 e0d2
-0000f7 2700
-0000f8 9309
-0000f9 8308                      clear_2 TempCounter ; reset the temporary counter
+0000ec 9160 009a                 lds r22, OCR3BL
+0000ee 9170 009b                 lds r23, OCR3BH
+0000f0 e001                      ldi temp, 1
+0000f1 e010                      ldi temp1, 0
+0000f2 0f60                      add r22, temp
+0000f3 1f71                      adc r23, temp1
+0000f4 9360 009a                 sts OCR3BL, r22
+0000f6 9370 009b                 sts OCR3BH, r23
+0000f8 e060                      ldi r22, 0
+0000f9 e070                      ldi r23, 0
+0000fa 9360 0204                 sts RevCounter, r22
+0000fc 9370 0205                 sts RevCounter+1, r23
+0000fe e0c2
+0000ff e0d2
+000100 2700
+000101 9309
+000102 8308                      clear_2 TempCounter ; reset the temporary counter
                                  ; Load the value of the second counter
-0000fa 9180 0200                 lds r24, SecondCounter
-0000fc 9190 0201                 lds r25, SecondCounter+1
-0000fe 9601                      adiw r25:r24, 1 ; increase the second counter by one
-0000ff 9380 0200                 sts SecondCounter, r24
-000101 9390 0201                 sts SecondCounter+1, r25
-000103 c004                      rjmp EndIF
+000103 9180 0200                 lds r24, SecondCounter
+000105 9190 0201                 lds r25, SecondCounter+1
+000107 9601                      adiw r25:r24, 1 ; increase the second counter by one
+000108 9380 0200                 sts SecondCounter, r24
+00010a 9390 0201                 sts SecondCounter+1, r25
+00010c c004                      rjmp EndIF
                                   
                                  NotSecond: ; store the new value of the temporary counter
-000104 9380 0202                 sts TempCounter, r24
-000106 9390 0203                 sts TempCounter+1, r25
+00010d 9380 0202                 sts TempCounter, r24
+00010f 9390 0203                 sts TempCounter+1, r25
                                   
-000108 918f                      EndIF: pop r24 ; epilogue starts
-000109 919f                      pop r25 ; restore all conflicting registers from the stack
-00010a 91cf                      pop YL
-00010b 91df                      pop YH
-00010c 910f                      pop temp
-00010d bf0f                      out SREG, temp
-00010e 9518                      reti ; return from the interrupt
+000111 918f                      EndIF: pop r24 ; epilogue starts
+000112 919f                      pop r25 ; restore all conflicting registers from the stack
+000113 91cf                      pop YL
+000114 91df                      pop YH
+000115 910f                      pop temp
+000116 bf0f                      out SREG, temp
+000117 9518                      reti ; return from the interrupt
                                      
                                  
                                  
                                  
                                  main: ; main - does nothing 
-00010f 2788                      clr flag
-000110 e000                      ldi temp, 0b00000000
-000111 bd04                      out TCCR0A, temp
-000112 e002                      ldi temp, 0b00000010
-000113 bd05                      out TCCR0B, temp ; set prescalar value to 8
-000114 e001                      ldi temp, 1<<TOIE0 ; TOIE0 is the bit number of TOIE0 which is 0
-000115 9300 006e                 sts TIMSK0, temp ; enable Timer0 Overflow Interrupt
-000117 9478                      sei ; enable global interrupt
-000118 cfff                      loop: rjmp loop
+000118 2722                      clr flag
+000119 e000                      ldi temp, 0b00000000
+00011a bd04                      out TCCR0A, temp
+00011b e002                      ldi temp, 0b00000010
+00011c bd05                      out TCCR0B, temp ; set prescalar value to 8
+00011d e001                      ldi temp, 1<<TOIE0 ; TOIE0 is the bit number of TOIE0 which is 0
+00011e 9300 006e                 sts TIMSK0, temp ; enable Timer0 Overflow Interrupt
+000120 9478                      sei ; enable global interrupt
+000121 cfff                      loop: rjmp loop
                                  
                                  
                                  
@@ -2201,79 +2207,79 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Incl
                                  ;
                                  
                                  lcd_command:
-000119 bb01                      	out PORTF, r16
-00011a 0000                      	nop
-00011b 9a16                      	lcd_set LCD_E
-00011c 0000                      	nop
-00011d 0000                      	nop
-00011e 0000                      	nop
-00011f 9816                      	lcd_clr LCD_E
-000120 0000                      	nop
-000121 0000                      	nop
-000122 0000                      	nop
-000123 9508                      	ret
-                                 
-                                 lcd_data:
-000124 bb01                      	out PORTF, r16
-000125 9a17                      	lcd_set LCD_RS
+000122 bb01                      	out PORTF, r16
+000123 0000                      	nop
+000124 9a16                      	lcd_set LCD_E
+000125 0000                      	nop
 000126 0000                      	nop
 000127 0000                      	nop
-000128 0000                      	nop
-000129 9a16                      	lcd_set LCD_E
+000128 9816                      	lcd_clr LCD_E
+000129 0000                      	nop
 00012a 0000                      	nop
 00012b 0000                      	nop
-00012c 0000                      	nop
-00012d 9816                      	lcd_clr LCD_E
-00012e 0000                      	nop
+00012c 9508                      	ret
+                                 
+                                 lcd_data:
+00012d bb01                      	out PORTF, r16
+00012e 9a17                      	lcd_set LCD_RS
 00012f 0000                      	nop
 000130 0000                      	nop
-000131 9817                      	lcd_clr LCD_RS
-000132 9508                      	ret
+000131 0000                      	nop
+000132 9a16                      	lcd_set LCD_E
+000133 0000                      	nop
+000134 0000                      	nop
+000135 0000                      	nop
+000136 9816                      	lcd_clr LCD_E
+000137 0000                      	nop
+000138 0000                      	nop
+000139 0000                      	nop
+00013a 9817                      	lcd_clr LCD_RS
+00013b 9508                      	ret
                                  
                                  lcd_wait:
-000133 930f                      	push r16
-000134 2700                      	clr r16
-000135 bb00                      	out DDRF, r16
-000136 bb01                      	out PORTF, r16
-000137 9a15                      	lcd_set LCD_RW
+00013c 930f                      	push r16
+00013d 2700                      	clr r16
+00013e bb00                      	out DDRF, r16
+00013f bb01                      	out PORTF, r16
+000140 9a15                      	lcd_set LCD_RW
                                  lcd_wait_loop:
-000138 0000                      	nop
-000139 9a16                      	lcd_set LCD_E
-00013a 0000                      	nop
-00013b 0000                      	nop
-00013c 0000                              nop
-00013d b10f                      	in r16, PINF
-00013e 9816                      	lcd_clr LCD_E
-00013f fd07                      	sbrc r16, 7
-000140 cff7                      	rjmp lcd_wait_loop
-000141 9815                      	lcd_clr LCD_RW
-000142 ef0f                      	ser r16
-000143 bb00                      	out DDRF, r16
-000144 910f                      	pop r16
-000145 9508                      	ret
+000141 0000                      	nop
+000142 9a16                      	lcd_set LCD_E
+000143 0000                      	nop
+000144 0000                      	nop
+000145 0000                              nop
+000146 b10f                      	in r16, PINF
+000147 9816                      	lcd_clr LCD_E
+000148 fd07                      	sbrc r16, 7
+000149 cff7                      	rjmp lcd_wait_loop
+00014a 9815                      	lcd_clr LCD_RW
+00014b ef0f                      	ser r16
+00014c bb00                      	out DDRF, r16
+00014d 910f                      	pop r16
+00014e 9508                      	ret
                                  
                                  .equ F_CPU = 16000000
                                  .equ DELAY_1MS = F_CPU / 4 / 1000 - 4
                                  ; 4 cycles per iteration - setup/call-return overhead
                                  
                                  sleep_1ms:
-000146 938f                      	push r24
-000147 939f                      	push r25
-000148 e09f                      	ldi r25, high(DELAY_1MS)
-000149 e98c                      	ldi r24, low(DELAY_1MS)
+00014f 938f                      	push r24
+000150 939f                      	push r25
+000151 e09f                      	ldi r25, high(DELAY_1MS)
+000152 e98c                      	ldi r24, low(DELAY_1MS)
                                  delayloop_1ms:
-00014a 9701                      	sbiw r25:r24, 1
-00014b f7f1                      	brne delayloop_1ms
-00014c 919f                      	pop r25
-00014d 918f                      	pop r24
-00014e 9508                      	ret
+000153 9701                      	sbiw r25:r24, 1
+000154 f7f1                      	brne delayloop_1ms
+000155 919f                      	pop r25
+000156 918f                      	pop r24
+000157 9508                      	ret
                                  
                                  sleep_5ms:
-00014f dff6                      	rcall sleep_1ms
-000150 dff5                      	rcall sleep_1ms
-000151 dff4                      	rcall sleep_1ms
-000152 dff3                      	rcall sleep_1ms
-000153 dff2                      	rcall sleep_1ms
+000158 dff6                      	rcall sleep_1ms
+000159 dff5                      	rcall sleep_1ms
+00015a dff4                      	rcall sleep_1ms
+00015b dff3                      	rcall sleep_1ms
+00015c dff2                      	rcall sleep_1ms
 
 
 RESOURCE USE INFORMATION
@@ -2292,11 +2298,11 @@ counted separately from r26..r31 here.
 
 "ATmega2560" register use summary:
 x  :   0 y  :   2 z  :   0 r0 :   2 r1 :   2 r2 :   0 r3 :   0 r4 :   0 
-r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  87 r17:  18 r18:   6 r19:   6 r20:   9 
-r21:  11 r22:  17 r23:  20 r24:  23 r25:  16 r26:   0 r27:   0 r28:   3 
+r5 :   0 r6 :   0 r7 :   0 r8 :   6 r9 :   6 r10:   6 r11:   0 r12:   0 
+r13:   0 r14:   0 r15:   0 r16: 100 r17:  18 r18:   7 r19:   0 r20:   3 
+r21:  12 r22:  17 r23:  21 r24:  16 r25:  16 r26:   0 r27:   0 r28:   3 
 r29:   3 r30:   0 r31:   0 
-Registers used: 15 out of 35 (42.9%)
+Registers used: 17 out of 35 (48.6%)
 
 "ATmega2560" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   3 add   :   4 adiw  :   2 and   :   0 
@@ -2305,14 +2311,14 @@ brcc  :   0 brcs  :   0 break :   0 breq  :   2 brge  :   0 brhc  :   0
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   1 brlt  :   0 brmi  :   0 
 brne  :   7 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   5 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   9 cls   :   0 
+clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  10 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   3 cpc   :   6 
 cpi   :   6 cpse  :   0 dec   :   0 eicall:   0 eijmp :   0 elpm  :   0 
 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 
-in    :   6 inc   :   1 jmp   :   7 ld    :   0 ldd   :   0 ldi   :  37 
-lds   :  15 lpm   :   0 lsl   :   0 lsr   :   0 mov   :   2 movw  :   0 
+in    :   6 inc   :   1 jmp   :   7 ld    :   0 ldd   :   0 ldi   :  38 
+lds   :  15 lpm   :   0 lsl   :   0 lsr   :   0 mov   :   8 movw  :   0 
 mul   :   2 muls  :   0 mulsu :   0 neg   :   0 nop   :  20 or    :   0 
-ori   :   1 out   :  22 pop   :  20 push  :  16 rcall :   5 ret   :   5 
+ori   :   1 out   :  23 pop   :  20 push  :  16 rcall :   5 ret   :   5 
 reti  :   7 rjmp  :   3 rol   :   0 ror   :   0 sbc   :   5 sbci  :   0 
 sbi   :   5 sbic  :   0 sbis  :   0 sbiw  :   1 sbr   :   0 sbrc  :   1 
 sbrs  :   0 sec   :   0 seh   :   0 sei   :   2 sen   :   0 ser   :   2 
@@ -2324,7 +2330,7 @@ Instructions used: 36 out of 116 (31.0%)
 "ATmega2560" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0002aa    606      0    606  262144   0.2%
+[.cseg] 0x000000 0x0002bc    624      0    624  262144   0.2%
 [.dseg] 0x000200 0x000207      0      7      7    8192   0.1%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 
