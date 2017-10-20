@@ -134,8 +134,8 @@ ldi temp, 1
 add r22, temp
 ldi temp, 0
 adc r23, temp
-sts SecondCounter, r24
-sts SecondCounter+1, r25
+sts RevCounter, r22
+sts RevCounter+1, r23
 end:
 pop r22
 pop r23
@@ -173,6 +173,10 @@ inc mins
 continue:*/
 jmp calculation
 end_calculation:
+ldi r22, 0
+ldi r23, 0
+sts RevCounter, r22
+sts RevCounter+1, r23
 /*ldi r16, 49
 display*/
 clear_2 TempCounter ; reset the temporary counter

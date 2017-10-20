@@ -67,6 +67,9 @@
     <Compile Include="TaskA.asm">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TaskB.asm">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Assembler.targets" />
 </Project>

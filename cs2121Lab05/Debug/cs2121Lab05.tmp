@@ -27,26 +27,26 @@
   <RevCounter><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>55</LINE></RevCounter>
   <RESET><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>69</LINE></RESET>
   <DEFAULT><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>67</LINE></DEFAULT>
-  <EXT_INT2><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>118</LINE></EXT_INT2>
-  <Timer0OVF><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>146</LINE></Timer0OVF>
-  <lcd_command><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>230</LINE></lcd_command>
-  <lcd_wait><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>260</LINE></lcd_wait>
-  <sleep_5ms><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>298</LINE></sleep_5ms>
-  <sleep_1ms><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>286</LINE></sleep_1ms>
-  <lcd_data><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>243</LINE></lcd_data>
-  <main><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>197</LINE></main>
-  <end><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>136</LINE></end>
-  <NotSecond><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>184</LINE></NotSecond>
-  <one_tenth_second><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>164</LINE></one_tenth_second>
-  <calculation><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>308</LINE></calculation>
-  <end_calculation><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>172</LINE></end_calculation>
-  <EndIF><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>188</LINE></EndIF>
-  <end_loop><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>208</LINE></end_loop>
-  <lcd_wait_loop><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>266</LINE></lcd_wait_loop>
-  <delayloop_1ms><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>291</LINE></delayloop_1ms>
-  <sub_ten_thousand><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>341</LINE></sub_ten_thousand>
-  <sub_thousand><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>352</LINE></sub_thousand>
-  <sub_hundred><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>363</LINE></sub_hundred>
-  <sub_ten><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>374</LINE></sub_ten>
+  <EXT_INT2><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>121</LINE></EXT_INT2>
+  <Timer0OVF><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>149</LINE></Timer0OVF>
+  <lcd_command><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>237</LINE></lcd_command>
+  <lcd_wait><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>267</LINE></lcd_wait>
+  <sleep_5ms><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>305</LINE></sleep_5ms>
+  <sleep_1ms><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>293</LINE></sleep_1ms>
+  <lcd_data><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>250</LINE></lcd_data>
+  <main><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>204</LINE></main>
+  <end><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>139</LINE></end>
+  <NotSecond><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>191</LINE></NotSecond>
+  <one_tenth_second><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>167</LINE></one_tenth_second>
+  <calculation><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>315</LINE></calculation>
+  <end_calculation><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>175</LINE></end_calculation>
+  <EndIF><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>195</LINE></EndIF>
+  <end_loop><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>215</LINE></end_loop>
+  <lcd_wait_loop><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>273</LINE></lcd_wait_loop>
+  <delayloop_1ms><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>298</LINE></delayloop_1ms>
+  <sub_ten_thousand><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>348</LINE></sub_ten_thousand>
+  <sub_thousand><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>359</LINE></sub_thousand>
+  <sub_hundred><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>370</LINE></sub_hundred>
+  <sub_ten><FILE>C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskA.asm</FILE><LINE>381</LINE></sub_ten>
  </LABELS>
 </ASSEMBLER_INFO>
