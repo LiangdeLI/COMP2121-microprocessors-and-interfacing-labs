@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm Fri Oct 20 16:14:52 2017
+AVRASM ver. 2.2.6  C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm Wed Oct 25 21:32:26 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
 C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m2560def.inc'
@@ -1899,18 +1899,26 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Incl
                                  .def temp1 = r17
                                  .def flag = r18
                                  .def holes = r20
-                                 
+                                 .def d_5 = r15
+                                 .def d_4 = r14
+                                 .def d_3 = r13
+                                 .def d_2 = r12
+                                 .def d_1 = r11
+                                 .def result_high = r7
+                                 .def result_low = r6
                                  
                                  .macro do_lcd_command
                                  	ldi r16, @0
                                  	rcall lcd_command
                                  	rcall lcd_wait
                                  .endmacro
+                                 
                                  .macro do_lcd_data
                                  	ldi r16, @0
                                  	rcall lcd_data
                                  	rcall lcd_wait
                                  .endmacro
+                                 
                                  ; The macro clears a word (2 bytes) in a memory
                                  ; the parameter @0 is the memory address for that word
                                  .macro clear_2
@@ -1920,273 +1928,348 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Incl
                                      st Y+, temp         ; clear the two bytes at @0 in SRAM
                                      st Y, temp
                                  .endmacro
+                                 
+                                 .macro display
+                                 	rcall lcd_data
+                                 	rcall lcd_wait
+                                 .endmacro
                                                          
                                  .dseg
-000200                           SecondCounter: .byte 2  ; Two-byte counter for counting seconds.
-000202                           TempCounter: .byte 2    ; Temporary counter. Used to determine 
-                                                         ; if one second has passed
-000204                           RevCounter: .byte 2 ; revolution counter
-000206                           TargetSpeed: .byte 1
+000200                           	SecondCounter: .byte 2  ; Two-byte counter for counting seconds.
+000202                           	TempCounter: .byte 2    ; Temporary counter. Used to determine 
+                                 							; if one second has passed
+000204                           	RevCounter: .byte 2 ; revolution counter
+000206                           	TargetSpeed: .byte 1
                                  
                                  .cseg
-                                 .org 0x0000
-000000 940c 0033                 jmp RESET
-                                 .org INT0addr ; INT0addr is the address of EXT_INT0
-000002 940c 0059                 jmp EXT_INT0
-                                 .org INT1addr ; INT1addr is the address of EXT_INT1
-000004 940c 007f                 jmp EXT_INT1
-                                 .org INT2addr ; 
-000006 940c 00a5                 jmp EXT_INT2
-                                 .org OVF0addr
-00002e 940c 00c0                 jmp Timer0OVF ; Jump to the interrupt handler for
-                                                         ; Timer3 overflow.
-000030 940c 0032                 jmp DEFAULT          ; default service for all other interrupts.
-000032 9518                      DEFAULT:  reti          ; no service
+                                 	.org 0x0000
+000000 940c 0033                 		jmp RESET
+                                 	.org INT0addr ; INT0addr is the address of EXT_INT0
+000002 940c 0094                 		jmp EXT_INT0
+                                 	.org INT1addr ; INT1addr is the address of EXT_INT1
+000004 940c 00ad                 		jmp EXT_INT1
+                                 	.org INT2addr ; 
+000006 940c 00c6                 		jmp EXT_INT2
+                                 	.org OVF0addr
+00002e 940c 00e1                 		jmp Timer0OVF ; Jump to the interrupt handler for
+                                 							; Timer3 overflow.
+000030 940c 0032                 	jmp DEFAULT          ; default service for all other interrupts.
+000032 9518                      	DEFAULT:  reti          ; no service
                                  
                                  
                                  RESET:
-000033 ef0f                      ldi temp, low(RAMEND)
-000034 bf0d                      out SPL, temp
-000035 e201                      ldi temp, high(RAMEND)
-000036 bf0e                      out SPH, temp
-000037 ef0f                      ser r16
-000038 b90d                      out DDRE, r16
-000039 bb00                      out DDRF, r16
-00003a b901                      out DDRA, r16
-00003b 2700                      clr r16
-00003c bb01                      out PORTF, r16
-00003d b902                      out PORTA, r16
-00003e 2700                      clr temp
-00003f b90a                      out DDRD, temp
-000040 b90b                      out PORTD, temp
-000041 e20a                      ldi temp, (2 << ISC20) | (2 << ISC10) | (2 << ISC00)
-000042 9300 0069                 sts EICRA, temp
-000044 b30d                      in temp, EIMSK
-000045 6007                      ori temp, (1<<INT2) | (1<<INT0) | (1<<INT1)
-000046 bb0d                      out EIMSK, temp
+000033 ef0f                      	ldi temp, low(RAMEND)
+000034 bf0d                      	out SPL, temp
+000035 e201                      	ldi temp, high(RAMEND)
+000036 bf0e                      	out SPH, temp
+000037 ef0f                      	ser r16
+                                 	
+000038 b90d                      	out DDRE, r16
+000039 bb00                      	out DDRF, r16
+00003a b901                      	out DDRA, r16
+00003b 2700                      	clr r16
+00003c bb01                      	out PORTF, r16
+00003d b902                      	out PORTA, r16
+00003e 2700                      	clr temp
+00003f b90a                      	out DDRD, temp
+000040 b90b                      	out PORTD, temp
+000041 e20a                      	ldi temp, (2 << ISC20) | (2 << ISC10) | (2 << ISC00)
+000042 9300 0069                 	sts EICRA, temp
+000044 b30d                      	in temp, EIMSK
+000045 6007                      	ori temp, (1<<INT2) | (1<<INT0) | (1<<INT1)
+000046 bb0d                      	out EIMSK, temp
                                  
+000047 e010                      	ldi temp1, 0 					
+000048 9310 009b                 	sts OCR3BH, temp1
+00004a e010                      	ldi temp1, 0
+00004b 9310 009a                 	sts OCR3BL, temp1
+00004d e010                      	ldi temp1, 0
+00004e 9310 0206                 	sts TargetSpeed, temp1
                                  
-000047 e010                      ldi temp1, 0 					
-000048 9310 009b                 sts OCR3BH, temp1
-00004a e010                      ldi temp1, 0
-00004b 9310 009a                 sts OCR3BL, temp1
-00004d e010                      ldi temp1, 0
-00004e 9310 0206                 sts TargetSpeed, temp1
+000050 e011                      	ldi temp1, (1 << CS30) 		; set the Timer3 to Phase Correct PWM mode. 
+000051 9310 0091                 	sts TCCR3B, temp1
+000053 e211                      	ldi temp1, (1<< WGM30)|(1<<COM3B1)
+000054 9310 0090                 	sts TCCR3A, temp1
                                  
-000050 e011                      ldi temp1, (1 << CS30) 		; set the Timer3 to Phase Correct PWM mode. 
-000051 9310 0091                 sts TCCR3B, temp1
-000053 e211                      ldi temp1, (1<< WGM30)|(1<<COM3B1)
-000054 9310 0090                 sts TCCR3A, temp1
+000056 e308
+000057 d0f0
+000058 d109                      	do_lcd_command 0b00111000 ; 2x5x7
+000059 d124                      	rcall sleep_5ms
+00005a e308
+00005b d0ec
+00005c d105                      	do_lcd_command 0b00111000 ; 2x5x7
+00005d d117                      	rcall sleep_1ms
+00005e e308
+00005f d0e8
+000060 d101                      	do_lcd_command 0b00111000 ; 2x5x7
+000061 e308
+000062 d0e5
+000063 d0fe                      	do_lcd_command 0b00111000 ; 2x5x7
+000064 e008
+000065 d0e2
+000066 d0fb                      	do_lcd_command 0b00001000 ; display off?
+000067 e001
+000068 d0df
+000069 d0f8                      	do_lcd_command 0b00000001 ; clear display
+00006a e006
+00006b d0dc
+00006c d0f5                      	do_lcd_command 0b00000110 ; increment, no display shift
+00006d e00e
+00006e d0d9
+00006f d0f2                      	do_lcd_command 0b00001110 ; Cursor on, bar, no blink
                                  
-000056 9478                      sei
-000057 940c 0118                 jmp main
+000070 e503
+000071 d0e1
+000072 d0ef                      	do_lcd_data 'S'
+000073 e700
+000074 d0de
+000075 d0ec                      	do_lcd_data 'p'
+000076 e605
+000077 d0db
+000078 d0e9                      	do_lcd_data 'e'
+000079 e605
+00007a d0d8
+00007b d0e6                      	do_lcd_data 'e'
+00007c e604
+00007d d0d5
+00007e d0e3                      	do_lcd_data 'd'
+00007f e30a
+000080 d0d2
+000081 d0e0                      	do_lcd_data ':'
+000082 e300
+000083 d0cf
+000084 d0dd                      	do_lcd_data '0'
+000085 e300
+000086 d0cc
+000087 d0da                      	do_lcd_data '0'
+000088 e300
+000089 d0c9
+00008a d0d7                      	do_lcd_data '0'
+00008b e300
+00008c d0c6
+00008d d0d4                      	do_lcd_data '0'
+00008e e300
+00008f d0c3
+000090 d0d1                      	do_lcd_data '0'
+                                 
+000091 9478                      	sei
+000092 940c 013e                 	jmp main
                                  
                                  
                                  
                                  EXT_INT0:
-000059 930f                      push temp
-00005a b70f                      in temp, SREG
-00005b 930f                      push temp
-00005c 3021                      cpi flag, 1
-00005d f429                      brne real_int0
-00005e 2722                      clr flag
-00005f 910f                      pop temp
-000060 bf0f                      out SREG, temp
-000061 910f                      pop temp
-000062 9518                      reti
-                                 real_int0:
-000063 e021                      ldi flag, 1
-000064 9100 0206                 lds temp, TargetSpeed
-000066 3604                      cpi temp, 100
-000067 f011                      breq END_BUTTON_ZERO
-000068 e114                      ldi temp1, 20
-000069 0f01                      add temp, temp1
-                                 END_BUTTON_ZERO:
-00006a 9300 0206                 sts TargetSpeed, temp
-00006c e071                      ldi r23, 1
-00006d 2755                      clr r21
-00006e ed0b                      ldi temp, 0xDB
-00006f 2e80                      mov r8, temp  
-000070 e70c                      ldi temp, 0x7C
-000071 2e90                      mov r9, temp
-000072 e003                      ldi temp, 0x03
-000073 2ea0                      mov r10, temp
-                                 delay1:
-000074 1a87                      sub r8, r23
-000075 0a95                      sbc r9, r21
-000076 0aa5                      sbc r10, r21
-000077 1685                      cp r8, r21
-000078 0695                      cpc r9, r21
-000079 06a5                      cpc r10, r21
-00007a f7c9                      brne delay1
-00007b 910f                      pop temp
-00007c bf0f                      out SREG, temp
-00007d 910f                      pop temp
-00007e 9518                      reti
+000094 930f                      	push temp
+000095 931f                      	push temp1
+000096 b70f                      	in temp, SREG
+000097 930f                      	push temp
+000098 3021                      	cpi flag, 1
+000099 f429                      	brne real_int0
+00009a 2722                      	clr flag
+00009b 910f                      	pop temp
+00009c bf0f                      	out SREG, temp
+00009d 910f                      	pop temp
+00009e 9518                      	reti
+                                 	real_int0:
+00009f e021                      	ldi flag, 1
+0000a0 9100 0206                 	lds temp, TargetSpeed
+0000a2 3604                      	cpi temp, 100
+0000a3 f011                      	breq END_BUTTON_ZERO
+0000a4 e114                      	ldi temp1, 20
+0000a5 0f01                      	add temp, temp1
+                                 	END_BUTTON_ZERO:
+0000a6 9300 0206                 	sts TargetSpeed, temp
+                                 	/*ldi r23, 1
+                                 	clr r21
+                                 	ldi temp, 0xDB
+                                 	mov r8, temp  
+                                 	ldi temp, 0x7C
+                                 	mov r9, temp
+                                 	ldi temp, 0x03
+                                 	mov r10, temp
+                                 	delay1:
+                                 	sub r8, r23
+                                 	sbc r9, r21
+                                 	sbc r10, r21
+                                 	cp r8, r21
+                                 	cpc r9, r21
+                                 	cpc r10, r21
+                                 	brne delay1*/
+0000a8 910f                      	pop temp
+0000a9 bf0f                      	out SREG, temp
+0000aa 911f                      	pop temp1
+0000ab 910f                      	pop temp
+0000ac 9518                      	reti
                                  
                                  
                                  
                                  EXT_INT1:
-00007f 930f                      push temp
-000080 b70f                      in temp, SREG
-000081 930f                      push temp
-000082 3021                      cpi flag, 1
-000083 f429                      brne real_int1
-000084 2722                      clr flag
-000085 910f                      pop temp
-000086 bf0f                      out SREG, temp
-000087 910f                      pop temp
-000088 9518                      reti
-                                 real_int1:
-000089 e021                      ldi flag, 1
-00008a 9100 0206                 lds temp, TargetSpeed
-00008c 3000                      cpi temp, 0
-00008d f011                      breq END_BUTTON_ONE
-00008e e114                      ldi temp1, 20
-00008f 1b01                      sub temp, temp1
-                                 END_BUTTON_ONE:
-000090 9300 0206                 sts TargetSpeed, temp
-000092 e071                      ldi r23, 1
-000093 2755                      clr r21
-000094 ed0b                      ldi temp, 0xDB
-000095 2e80                      mov r8, temp  
-000096 e70c                      ldi temp, 0x7C
-000097 2e90                      mov r9, temp
-000098 e003                      ldi temp, 0x03
-000099 2ea0                      mov r10, temp
-                                 delay2:
-00009a 1a87                      sub r8, r23
-00009b 0a95                      sbc r9, r21
-00009c 0aa5                      sbc r10, r21
-00009d 1685                      cp r8, r21
-00009e 0695                      cpc r9, r21
-00009f 06a5                      cpc r10, r21
-0000a0 f7c9                      brne delay2
-0000a1 910f                      pop temp
-0000a2 bf0f                      out SREG, temp
-0000a3 910f                      pop temp
-0000a4 9518                      reti
+0000ad 930f                      	push temp
+0000ae 931f                      	push temp1
+0000af b70f                      	in temp, SREG
+0000b0 930f                      	push temp
+0000b1 3021                      		cpi flag, 1
+0000b2 f429                      		brne real_int1
+0000b3 2722                      		clr flag
+0000b4 910f                      		pop temp
+0000b5 bf0f                      		out SREG, temp
+0000b6 910f                      		pop temp
+0000b7 9518                      		reti
+                                 	real_int1:
+0000b8 e021                      		ldi flag, 1
+0000b9 9100 0206                 		lds temp, TargetSpeed
+0000bb 3000                      		cpi temp, 0
+0000bc f011                      		breq END_BUTTON_ONE
+0000bd e114                      		ldi temp1, 20
+0000be 1b01                      		sub temp, temp1
+                                 	END_BUTTON_ONE:
+0000bf 9300 0206                 		sts TargetSpeed, temp
+                                 		/*ldi r23, 1
+                                 		clr r21
+                                 		ldi temp, 0xDB
+                                 		mov r8, temp  
+                                 		ldi temp, 0x7C
+                                 		mov r9, temp
+                                 		ldi temp, 0x03
+                                 		mov r10, temp
+                                 		delay2:
+                                 		sub r8, r23
+                                 		sbc r9, r21
+                                 		sbc r10, r21
+                                 		cp r8, r21
+                                 		cpc r9, r21
+                                 		cpc r10, r21
+                                 		brne delay2*/
+0000c1 910f                      		pop temp
+0000c2 bf0f                      		out SREG, temp
+0000c3 911f                      		pop temp1
+0000c4 910f                      		pop temp
+0000c5 9518                      		reti
                                  
                                  
                                  
                                  EXT_INT2:
-0000a5 930f                      push temp
-0000a6 b70f                      in temp, SREG
-0000a7 930f                      push temp
-0000a8 937f                      push r23
-0000a9 936f                      push r22
-0000aa 9543                      inc holes
-0000ab 3044                      cpi holes, 4
-0000ac f469                      brne end
-0000ad 2744                      clr holes
-0000ae 9160 0204                 lds r22, RevCounter
-0000b0 9170 0205                 lds r23, RevCounter+1
-0000b2 e001                      ldi temp, 1
-0000b3 0f60                      add r22, temp
-0000b4 e000                      ldi temp, 0
-0000b5 1f70                      adc r23, temp
-0000b6 9360 0204                 sts RevCounter, r22
-0000b8 9370 0205                 sts RevCounter+1, r23
-                                 end:
-0000ba 916f                      pop r22
-0000bb 917f                      pop r23
-0000bc 910f                      pop temp
-0000bd bf0f                      out SREG, temp
-0000be 910f                      pop temp
-0000bf 9518                      reti
+0000c6 930f                      	push temp
+0000c7 b70f                      	in temp, SREG
+0000c8 930f                      	push temp
+0000c9 937f                      	push r23
+0000ca 936f                      	push r22
+0000cb 9543                      		inc holes
+0000cc 3044                      		cpi holes, 4
+0000cd f469                      		brne end
+0000ce 2744                      		clr holes
+0000cf 9160 0204                 		lds r22, RevCounter
+0000d1 9170 0205                 		lds r23, RevCounter+1
+0000d3 e001                      		ldi temp, 1
+0000d4 0f60                      		add r22, temp
+0000d5 e000                      		ldi temp, 0
+0000d6 1f70                      		adc r23, temp
+0000d7 9360 0204                 		sts RevCounter, r22
+0000d9 9370 0205                 		sts RevCounter+1, r23
+                                 	end:
+0000db 916f                      		pop r22
+0000dc 917f                      		pop r23
+0000dd 910f                      		pop temp
+0000de bf0f                      		out SREG, temp
+0000df 910f                      		pop temp
+0000e0 9518                      		reti
                                  
                                  
                                  
                                  Timer0OVF: ; interrupt subroutine to Timer0
-0000c0 b70f                      in temp, SREG
-0000c1 930f                      push temp ; prologue starts
-0000c2 93df                      push YH ; save all conflicting registers in the prologue
-0000c3 93cf                      push YL
-0000c4 939f                      push r25
-0000c5 938f                      push r24 ; prologue ends
-                                 ; Load the value of the temporary counter
-0000c6 9180 0202                 lds r24, TempCounter
-0000c8 9190 0203                 lds r25, TempCounter+1
-0000ca 9601                      adiw r25:r24, 1 ; increase the temporary counter by one
-0000cb 308d                      cpi r24, low(781) ; check if (r25:r24) = 7812
-0000cc e003                      ldi temp, high(781) ; 7812 = 10^6/128
-0000cd 0790                      cpc r25, temp
-0000ce f5f1                      brne NotSecond
-                                 
-                                 one_tenth_second:
-0000cf 9160 0204                 lds r22, RevCounter
-0000d1 9170 0205                 lds r23, RevCounter+1
-0000d3 e00a                      ldi temp, 10
-0000d4 9f60                      mul r22, temp
-0000d5 2d80                      mov r24, r0
-0000d6 2d91                      mov r25, r1
-0000d7 9f70                      mul r23, temp
-0000d8 0d80                      add r24, r0
-0000d9 1d91                      adc r25, r1
-0000da 9160 0206                 lds r22, TargetSpeed
-0000dc e070                      ldi r23, 0
-0000dd 1786                      cp r24, r22
-0000de 0797                      cpc r25, r23
-0000df f060                      brlo less
-0000e0 9160 009a                 lds r22, OCR3BL
-0000e2 9170 009b                 lds r23, OCR3BH
-0000e4 e001                      ldi temp, 1
-0000e5 e010                      ldi temp1, 0
-0000e6 1b60                      sub r22, temp
-0000e7 0b71                      sbc r23, temp1
-0000e8 9360 009a                 sts OCR3BL, r22
-0000ea 9370 009b                 sts OCR3BH, r23
-                                 less:
-0000ec 9160 009a                 lds r22, OCR3BL
-0000ee 9170 009b                 lds r23, OCR3BH
-0000f0 e001                      ldi temp, 1
-0000f1 e010                      ldi temp1, 0
-0000f2 0f60                      add r22, temp
-0000f3 1f71                      adc r23, temp1
-0000f4 9360 009a                 sts OCR3BL, r22
-0000f6 9370 009b                 sts OCR3BH, r23
-0000f8 e060                      ldi r22, 0
-0000f9 e070                      ldi r23, 0
-0000fa 9360 0204                 sts RevCounter, r22
-0000fc 9370 0205                 sts RevCounter+1, r23
-0000fe e0c2
-0000ff e0d2
-000100 2700
-000101 9309
-000102 8308                      clear_2 TempCounter ; reset the temporary counter
-                                 ; Load the value of the second counter
-000103 9180 0200                 lds r24, SecondCounter
-000105 9190 0201                 lds r25, SecondCounter+1
-000107 9601                      adiw r25:r24, 1 ; increase the second counter by one
-000108 9380 0200                 sts SecondCounter, r24
-00010a 9390 0201                 sts SecondCounter+1, r25
-00010c c004                      rjmp EndIF
+0000e1 b70f                      	in temp, SREG
+0000e2 930f                      	push temp ; prologue starts
+0000e3 93df                      	push YH ; save all conflicting registers in the prologue
+0000e4 93cf                      	push YL
+0000e5 939f                      	push r25
+0000e6 938f                      	push r24 ; prologue ends
+                                 		; Load the value of the temporary counter
+0000e7 9180 0202                 		lds r24, TempCounter
+0000e9 9190 0203                 		lds r25, TempCounter+1
+0000eb 9601                      		adiw r25:r24, 1 ; increase the temporary counter by one
+0000ec 308d                      		cpi r24, low(781) ; check if (r25:r24) = 7812
+0000ed e003                      		ldi temp, high(781) ; 7812 = 10^6/128
+0000ee 0790                      		cpc r25, temp
+0000ef f409                      		brne NotASecond
+0000f0 c002                      		rjmp one_tenth_second
+                                 	NotASecond:
+0000f1 940c 0133                 		jmp NotSecond
+                                 	one_tenth_second:
+0000f3 940c 0184                 		jmp calculation
+                                 	end_calculation:
+0000f5 9160 0204                 		lds r22, RevCounter
+0000f7 9170 0205                 		lds r23, RevCounter+1
+0000f9 e00a                      		ldi temp, 10
+0000fa 9f60                      		mul r22, temp
+0000fb 2d80                      		mov r24, r0
+0000fc 2d91                      		mov r25, r1
+0000fd 9f70                      		mul r23, temp
+0000fe 0d80                      		add r24, r0
+0000ff 1d91                      		adc r25, r1
+000100 9160 0206                 		lds r22, TargetSpeed
+000102 e070                      		ldi r23, 0
+000103 1786                      		cp r24, r22
+000104 0797                      		cpc r25, r23
+000105 f060                      		brlo less
+000106 9160 009a                 		lds r22, OCR3BL
+000108 9170 009b                 		lds r23, OCR3BH
+00010a e001                      		ldi temp, 1
+00010b e010                      		ldi temp1, 0
+00010c 1b60                      		sub r22, temp
+00010d 0b71                      		sbc r23, temp1
+00010e 9360 009a                 		sts OCR3BL, r22
+000110 9370 009b                 		sts OCR3BH, r23
+                                 	less:
+000112 9160 009a                 		lds r22, OCR3BL
+000114 9170 009b                 		lds r23, OCR3BH
+000116 e001                      		ldi temp, 1
+000117 e010                      		ldi temp1, 0
+000118 0f60                      		add r22, temp
+000119 1f71                      		adc r23, temp1
+00011a 9360 009a                 		sts OCR3BL, r22
+00011c 9370 009b                 		sts OCR3BH, r23
+00011e e060                      		ldi r22, 0
+00011f e070                      		ldi r23, 0
+000120 9360 0204                 		sts RevCounter, r22
+000122 9370 0205                 		sts RevCounter+1, r23
+000124 e0c2
+000125 e0d2
+000126 2700
+000127 9309
+000128 8308                      		clear_2 TempCounter ; reset the temporary counter
+                                 		; Load the value of the second counter
+000129 9180 0200                 		lds r24, SecondCounter
+00012b 9190 0201                 		lds r25, SecondCounter+1
+00012d 9601                      		adiw r25:r24, 1 ; increase the second counter by one
+00012e 9380 0200                 		sts SecondCounter, r24
+000130 9390 0201                 		sts SecondCounter+1, r25
+000132 c004                      		rjmp EndIF
                                   
-                                 NotSecond: ; store the new value of the temporary counter
-00010d 9380 0202                 sts TempCounter, r24
-00010f 9390 0203                 sts TempCounter+1, r25
+                                 	NotSecond: ; store the new value of the temporary counter
+000133 9380 0202                 		sts TempCounter, r24
+000135 9390 0203                 		sts TempCounter+1, r25
                                   
-000111 918f                      EndIF: pop r24 ; epilogue starts
-000112 919f                      pop r25 ; restore all conflicting registers from the stack
-000113 91cf                      pop YL
-000114 91df                      pop YH
-000115 910f                      pop temp
-000116 bf0f                      out SREG, temp
-000117 9518                      reti ; return from the interrupt
+                                 	EndIF: 
+000137 918f                      		pop r24 ; epilogue starts
+000138 919f                      		pop r25 ; restore all conflicting registers from the stack
+000139 91cf                      		pop YL
+00013a 91df                      		pop YH
+00013b 910f                      		pop temp
+00013c bf0f                      		out SREG, temp
+00013d 9518                      		reti ; return from the interrupt
                                      
                                  
                                  
                                  
                                  main: ; main - does nothing 
-000118 2722                      clr flag
-000119 e000                      ldi temp, 0b00000000
-00011a bd04                      out TCCR0A, temp
-00011b e002                      ldi temp, 0b00000010
-00011c bd05                      out TCCR0B, temp ; set prescalar value to 8
-00011d e001                      ldi temp, 1<<TOIE0 ; TOIE0 is the bit number of TOIE0 which is 0
-00011e 9300 006e                 sts TIMSK0, temp ; enable Timer0 Overflow Interrupt
-000120 9478                      sei ; enable global interrupt
-000121 cfff                      loop: rjmp loop
+00013e 2722                      	clr flag
+00013f e000                      	ldi temp, 0b00000000
+000140 bd04                      	out TCCR0A, temp
+000141 e002                      	ldi temp, 0b00000010
+000142 bd05                      	out TCCR0B, temp ; set prescalar value to 8
+000143 e001                      	ldi temp, 1<<TOIE0 ; TOIE0 is the bit number of TOIE0 which is 0
+000144 9300 006e                 	sts TIMSK0, temp ; enable Timer0 Overflow Interrupt
+000146 9478                      	sei ; enable global interrupt
+000147 cfff                      	loop: rjmp loop
                                  
                                  
                                  
@@ -2207,79 +2290,227 @@ C:\Users\Lee\Documents\Atmel Studio\7.0\cs2121lab\cs2121Lab05\TaskB.asm(8): Incl
                                  ;
                                  
                                  lcd_command:
-000122 bb01                      	out PORTF, r16
-000123 0000                      	nop
-000124 9a16                      	lcd_set LCD_E
-000125 0000                      	nop
-000126 0000                      	nop
-000127 0000                      	nop
-000128 9816                      	lcd_clr LCD_E
-000129 0000                      	nop
-00012a 0000                      	nop
-00012b 0000                      	nop
-00012c 9508                      	ret
+000148 bb01                      	out PORTF, r16
+000149 0000                      	nop
+00014a 9a16                      	lcd_set LCD_E
+00014b 0000                      	nop
+00014c 0000                      	nop
+00014d 0000                      	nop
+00014e 9816                      	lcd_clr LCD_E
+00014f 0000                      	nop
+000150 0000                      	nop
+000151 0000                      	nop
+000152 9508                      	ret
                                  
                                  lcd_data:
-00012d bb01                      	out PORTF, r16
-00012e 9a17                      	lcd_set LCD_RS
-00012f 0000                      	nop
-000130 0000                      	nop
-000131 0000                      	nop
-000132 9a16                      	lcd_set LCD_E
-000133 0000                      	nop
-000134 0000                      	nop
-000135 0000                      	nop
-000136 9816                      	lcd_clr LCD_E
-000137 0000                      	nop
-000138 0000                      	nop
-000139 0000                      	nop
-00013a 9817                      	lcd_clr LCD_RS
-00013b 9508                      	ret
+000153 bb01                      	out PORTF, r16
+000154 9a17                      	lcd_set LCD_RS
+000155 0000                      	nop
+000156 0000                      	nop
+000157 0000                      	nop
+000158 9a16                      	lcd_set LCD_E
+000159 0000                      	nop
+00015a 0000                      	nop
+00015b 0000                      	nop
+00015c 9816                      	lcd_clr LCD_E
+00015d 0000                      	nop
+00015e 0000                      	nop
+00015f 0000                      	nop
+000160 9817                      	lcd_clr LCD_RS
+000161 9508                      	ret
                                  
                                  lcd_wait:
-00013c 930f                      	push r16
-00013d 2700                      	clr r16
-00013e bb00                      	out DDRF, r16
-00013f bb01                      	out PORTF, r16
-000140 9a15                      	lcd_set LCD_RW
+000162 930f                      	push r16
+000163 2700                      	clr r16
+000164 bb00                      	out DDRF, r16
+000165 bb01                      	out PORTF, r16
+000166 9a15                      	lcd_set LCD_RW
                                  lcd_wait_loop:
-000141 0000                      	nop
-000142 9a16                      	lcd_set LCD_E
-000143 0000                      	nop
-000144 0000                      	nop
-000145 0000                              nop
-000146 b10f                      	in r16, PINF
-000147 9816                      	lcd_clr LCD_E
-000148 fd07                      	sbrc r16, 7
-000149 cff7                      	rjmp lcd_wait_loop
-00014a 9815                      	lcd_clr LCD_RW
-00014b ef0f                      	ser r16
-00014c bb00                      	out DDRF, r16
-00014d 910f                      	pop r16
-00014e 9508                      	ret
+000167 0000                      	nop
+000168 9a16                      	lcd_set LCD_E
+000169 0000                      	nop
+00016a 0000                      	nop
+00016b 0000                              nop
+00016c b10f                      	in r16, PINF
+00016d 9816                      	lcd_clr LCD_E
+00016e fd07                      	sbrc r16, 7
+00016f cff7                      	rjmp lcd_wait_loop
+000170 9815                      	lcd_clr LCD_RW
+000171 ef0f                      	ser r16
+000172 bb00                      	out DDRF, r16
+000173 910f                      	pop r16
+000174 9508                      	ret
                                  
                                  .equ F_CPU = 16000000
                                  .equ DELAY_1MS = F_CPU / 4 / 1000 - 4
                                  ; 4 cycles per iteration - setup/call-return overhead
                                  
                                  sleep_1ms:
-00014f 938f                      	push r24
-000150 939f                      	push r25
-000151 e09f                      	ldi r25, high(DELAY_1MS)
-000152 e98c                      	ldi r24, low(DELAY_1MS)
+000175 938f                      	push r24
+000176 939f                      	push r25
+000177 e09f                      	ldi r25, high(DELAY_1MS)
+000178 e98c                      	ldi r24, low(DELAY_1MS)
                                  delayloop_1ms:
-000153 9701                      	sbiw r25:r24, 1
-000154 f7f1                      	brne delayloop_1ms
-000155 919f                      	pop r25
-000156 918f                      	pop r24
-000157 9508                      	ret
+000179 9701                      	sbiw r25:r24, 1
+00017a f7f1                      	brne delayloop_1ms
+00017b 919f                      	pop r25
+00017c 918f                      	pop r24
+00017d 9508                      	ret
                                  
                                  sleep_5ms:
-000158 dff6                      	rcall sleep_1ms
-000159 dff5                      	rcall sleep_1ms
-00015a dff4                      	rcall sleep_1ms
-00015b dff3                      	rcall sleep_1ms
-00015c dff2                      	rcall sleep_1ms
+00017e dff6                      	rcall sleep_1ms
+00017f dff5                      	rcall sleep_1ms
+000180 dff4                      	rcall sleep_1ms
+000181 dff3                      	rcall sleep_1ms
+000182 dff2                      	rcall sleep_1ms
+000183 9508                      	ret
+                                 
+                                 
+                                 
+                                 calculation:
+000184 e100                      	ldi temp, low(10000)
+000185 2e30                      	mov r3, temp
+000186 e207                      	ldi temp, high(10000)
+000187 2e40                      	mov r4, temp
+000188 ee08                      	ldi temp, low(1000)
+000189 2e50                      	mov r5, temp
+00018a e003                      	ldi temp, high(1000)
+00018b 2e60                      	mov r6, temp
+00018c e604                      	ldi temp, 100
+00018d 2e70                      	mov r7, temp
+00018e e00a                      	ldi temp, 10
+00018f 2e80                      	mov r8, temp
+000190 24ff                      	clr d_5
+000191 24ee                      	clr d_4
+000192 24dd                      	clr d_3
+000193 24cc                      	clr d_2
+000194 24bb                      	clr d_1
+                                 
+000195 e090                      	ldi r25, 0
+000196 9100 0204                 	lds temp, RevCounter
+000198 2e60                      	mov result_low, temp
+000199 9100 0205                 	lds temp, RevCounter+1
+00019b 2e70                      	mov result_high, temp
+00019c 2700                      	clr temp
+                                 	/*sts SecondCounter, temp
+                                 	sts SecondCounter+1, temp*/
+                                 	/*ldi r25, 0b11111111
+                                 	mov result_low, r25
+                                 	ldi r25, 0b111111
+                                 	mov result_high, r25
+                                 	ldi r25, 0*/
+                                 
+                                 	sub_ten_thousand:
+00019d 1863                      		sub result_low, r3
+00019e 0874                      		sbc result_high, r4
+00019f 94f3                      		inc d_5
+0001a0 1669                      		cp result_low, r25
+0001a1 0679                      		cpc result_high, r25
+0001a2 f7d4                      		brge sub_ten_thousand
+0001a3 0c63                      		add result_low, r3
+0001a4 1c74                      		adc result_high, r4
+0001a5 94fa                      		dec d_5
+                                 
+                                 	sub_thousand:
+0001a6 1865                      		sub result_low, r5
+0001a7 0876                      		sbc result_high, r6
+0001a8 94e3                      		inc d_4
+0001a9 1669                      		cp result_low, r25
+0001aa 0679                      		cpc result_high, r25
+0001ab f7d4                      		brge sub_thousand
+0001ac 0c65                      		add result_low, r5
+0001ad 1c76                      		adc result_high, r6
+0001ae 94ea                      		dec d_4
+                                 
+                                 	sub_hundred:
+0001af 1867                      		sub result_low, r7
+0001b0 0a79                      		sbc result_high, r25
+0001b1 94d3                      		inc d_3
+0001b2 1669                      		cp result_low, r25
+0001b3 0679                      		cpc result_high, r25
+0001b4 f7d4                      		brge sub_hundred
+0001b5 0c67                      		add result_low, r7
+0001b6 1e79                      		adc result_high, r25
+0001b7 94da                      		dec d_3
+                                 
+                                 	sub_ten:
+0001b8 1868                      		sub result_low, r8
+0001b9 0a79                      		sbc result_high, r25
+0001ba 94c3                      		inc d_2
+0001bb 1669                      		cp result_low, r25
+0001bc 0679                      		cpc result_high, r25
+0001bd f7d4                      		brge sub_ten
+0001be 0c68                      		add result_low, r8
+0001bf 1e79                      		adc result_high, r25
+0001c0 94ca                      		dec d_2
+                                 
+0001c1 2cb6                      	mov d_1, result_low
+                                 
+                                 
+                                 
+                                 	/*do_lcd_command 0b00111000 ; 2x5x7
+                                 	rcall sleep_5ms
+                                 	do_lcd_command 0b00111000 ; 2x5x7
+                                 	rcall sleep_1ms
+                                 	do_lcd_command 0b00111000 ; 2x5x7
+                                 	do_lcd_command 0b00111000 ; 2x5x7
+                                 	do_lcd_command 0b00001000 ; display off?*/
+0001c2 e001
+0001c3 df84
+0001c4 df9d                      	do_lcd_command 0b00000001 ; clear display
+0001c5 e006
+0001c6 df81
+0001c7 df9a                      	do_lcd_command 0b00000110 ; increment, no display shift
+0001c8 e00e
+0001c9 df7e
+0001ca df97                      	do_lcd_command 0b00001110 ; Cursor on, bar, no blink
+                                 
+0001cb e503
+0001cc df86
+0001cd df94                      	do_lcd_data 'S'
+0001ce e700
+0001cf df83
+0001d0 df91                      	do_lcd_data 'p'
+0001d1 e605
+0001d2 df80
+0001d3 df8e                      	do_lcd_data 'e'
+0001d4 e605
+0001d5 df7d
+0001d6 df8b                      	do_lcd_data 'e'
+0001d7 e604
+0001d8 df7a
+0001d9 df88                      	do_lcd_data 'd'
+0001da e30a
+0001db df77
+0001dc df85                      	do_lcd_data ':'
+                                 
+0001dd 2d0f                      	mov r16, d_5
+0001de e3b0                      	ldi r27, 48
+0001df 0f0b                      	add r16, r27
+0001e0 df72
+0001e1 df80                      	display
+0001e2 2d0e                      	mov r16, d_4
+0001e3 0f0b                      	add r16, r27
+0001e4 df6e
+0001e5 df7c                      	display
+0001e6 e3b0                      	ldi r27, 48
+0001e7 2d0d                      	mov r16, d_3
+0001e8 0f0b                      	add r16, r27
+0001e9 df69
+0001ea df77                      	display
+0001eb e3b0                      	ldi r27, 48
+0001ec 2d0c                      	mov r16, d_2
+0001ed 0f0b                      	add r16, r27
+0001ee df64
+0001ef df72                      	display
+0001f0 e3b0                      	ldi r27, 48
+0001f1 2d0b                      	mov r16, d_1
+0001f2 0f0b                      	add r16, r27
+0001f3 df5f
+0001f4 df6d                      	display
+0001f5 e300
+0001f6 df5c
+0001f7 df6a                      	do_lcd_data '0'
 
 
 RESOURCE USE INFORMATION
@@ -2297,40 +2528,40 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega2560" register use summary:
-x  :   0 y  :   2 z  :   0 r0 :   2 r1 :   2 r2 :   0 r3 :   0 r4 :   0 
-r5 :   0 r6 :   0 r7 :   0 r8 :   6 r9 :   6 r10:   6 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16: 100 r17:  18 r18:   7 r19:   0 r20:   3 
-r21:  12 r22:  17 r23:  21 r24:  16 r25:  16 r26:   0 r27:   0 r28:   3 
+x  :   0 y  :   2 z  :   0 r0 :   2 r1 :   2 r2 :   0 r3 :   3 r4 :   3 
+r5 :   3 r6 :  17 r7 :  16 r8 :   3 r9 :   0 r10:   0 r11:   3 r12:   4 
+r13:   4 r14:   4 r15:   4 r16: 144 r17:  22 r18:   7 r19:   0 r20:   3 
+r21:   0 r22:  17 r23:  17 r24:  16 r25:  29 r26:   0 r27:   9 r28:   3 
 r29:   3 r30:   0 r31:   0 
-Registers used: 17 out of 35 (48.6%)
+Registers used: 25 out of 35 (71.4%)
 
 "ATmega2560" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   3 add   :   4 adiw  :   2 and   :   0 
+.lds  :   0 .sts  :   0 adc   :   7 add   :  13 adiw  :   2 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   2 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   2 brge  :   4 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   1 brlt  :   0 brmi  :   0 
-brne  :   7 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brne  :   5 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   5 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  10 cls   :   0 
-clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   3 cpc   :   6 
-cpi   :   6 cpse  :   0 dec   :   0 eicall:   0 eijmp :   0 elpm  :   0 
+clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  14 cls   :   0 
+clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   5 cpc   :   6 
+cpi   :   6 cpse  :   0 dec   :   4 eicall:   0 eijmp :   0 elpm  :   0 
 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 
-in    :   6 inc   :   1 jmp   :   7 ld    :   0 ldd   :   0 ldi   :  38 
-lds   :  15 lpm   :   0 lsl   :   0 lsr   :   0 mov   :   8 movw  :   0 
+in    :   6 inc   :   5 jmp   :  10 ld    :   0 ldd   :   0 ldi   :  70 
+lds   :  17 lpm   :   0 lsl   :   0 lsr   :   0 mov   :  16 movw  :   0 
 mul   :   2 muls  :   0 mulsu :   0 neg   :   0 nop   :  20 or    :   0 
-ori   :   1 out   :  23 pop   :  20 push  :  16 rcall :   5 ret   :   5 
-reti  :   7 rjmp  :   3 rol   :   0 ror   :   0 sbc   :   5 sbci  :   0 
+ori   :   1 out   :  23 pop   :  22 push  :  18 rcall :  75 ret   :   5 
+reti  :   7 rjmp  :   4 rol   :   0 ror   :   0 sbc   :   5 sbci  :   0 
 sbi   :   5 sbic  :   0 sbis  :   0 sbiw  :   1 sbr   :   0 sbrc  :   1 
 sbrs  :   0 sec   :   0 seh   :   0 sei   :   2 sen   :   0 ser   :   2 
 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 spm   :   0 
-st    :   2 std   :   0 sts   :  21 sub   :   4 subi  :   0 swap  :   0 
+st    :   2 std   :   0 sts   :  21 sub   :   6 subi  :   0 swap  :   0 
 tst   :   0 wdr   :   0 
-Instructions used: 36 out of 116 (31.0%)
+Instructions used: 38 out of 116 (32.8%)
 
 "ATmega2560" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0002bc    624      0    624  262144   0.2%
+[.cseg] 0x000000 0x0003f4    936      0    936  262144   0.4%
 [.dseg] 0x000200 0x000207      0      7      7    8192   0.1%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 
