@@ -56,11 +56,11 @@
 .cseg
 	.org 0x0000
 		jmp RESET
-	.org INT0addr ; INT0addr is the address of EXT_INT0
+	//.org INT0addr ; INT0addr is the address of EXT_INT0
 		jmp EXT_INT0
-	.org INT1addr ; INT1addr is the address of EXT_INT1
+	//.org INT1addr ; INT1addr is the address of EXT_INT1
 		jmp EXT_INT1
-	.org INT2addr ; 
+	//.org INT2addr ; 
 		jmp EXT_INT2
 	.org OVF0addr
 		jmp Timer0OVF ; Jump to the interrupt handler for
@@ -136,38 +136,59 @@ EXT_INT0:
 	push temp1
 	in temp, SREG
 	push temp
-	cpi flag, 1
-	brne real_int0
-	clr flag
-	pop temp
-	out SREG, temp
-	pop temp
-	reti
+	push r21
+	push r23
+	push r10
+	push r9
+	push r8
+		cpi flag, 1
+		brne real_int0
+		clr flag
+		pop r8
+		pop r9
+		pop r10
+		pop r23
+	    pop r21
+		pop temp
+		out SREG, temp
+		pop temp
+		reti
 	real_int0:
-	ldi flag, 1
-	lds temp, TargetSpeed
-	cpi temp, 100
-	breq END_BUTTON_ZERO
-	ldi temp1, 20
-	add temp, temp1
+		ldi flag, 1
+		lds temp, TargetSpeed
+		cpi temp, 100
+		breq END_BUTTON_ZERO
+		ldi temp1, 20
+		add temp, temp1
 	END_BUTTON_ZERO:
-	sts TargetSpeed, temp
-	/*ldi r23, 1
-	clr r21
-	ldi temp, 0xDB
-	mov r8, temp  
-	ldi temp, 0x7C
-	mov r9, temp
-	ldi temp, 0x03
-	mov r10, temp
-	delay1:
-	sub r8, r23
-	sbc r9, r21
-	sbc r10, r21
-	cp r8, r21
-	cpc r9, r21
-	cpc r10, r21
-	brne delay1*/
+		sts TargetSpeed, temp
+		do_lcd_command 0b00001000 ; display off
+		do_lcd_command 0b00000001 ; clear display
+	    do_lcd_command 0b00000110 ; increment, no display shift
+	    do_lcd_command 0b00001110 ; Cursor on, bar, no blink
+		do_lcd_data '0'
+		do_lcd_data '0'
+		ldi r23, 1
+		clr r21
+		ldi temp, 0xDB
+		mov r8, temp  
+		ldi temp, 0x7C
+		mov r9, temp
+		ldi temp, 0x03
+		mov r10, temp
+		delay1:
+		sub r8, r23
+		sbc r9, r21
+		sbc r10, r21
+		cp r8, r21
+		cpc r9, r21
+		cpc r10, r21
+		brne delay1
+	pop r8
+	pop r9
+	pop r10
+	pop r23
+	pop r21
 	pop temp
 	out SREG, temp
 	pop temp1
@@ -181,9 +202,19 @@ EXT_INT1:
 	push temp1
 	in temp, SREG
 	push temp
+	push r21
+	push r23
+	push r10
+	push r9
+	push r8
 		cpi flag, 1
 		brne real_int1
 		clr flag
+	    pop r8
+	    pop r9
+	    pop r10
+		pop r23
+	    pop r21
 		pop temp
 		out SREG, temp
 		pop temp
@@ -197,7 +228,13 @@ EXT_INT1:
 		sub temp, temp1
 	END_BUTTON_ONE:
 		sts TargetSpeed, temp
-		/*ldi r23, 1
+		do_lcd_command 0b00001000 ; display off
+		do_lcd_command 0b00000001 ; clear display
+	    do_lcd_command 0b00000110 ; increment, no display shift
+	    do_lcd_command 0b00001110 ; Cursor on, bar, no blink
+		do_lcd_data '1'
+		do_lcd_data '1'
+		ldi r23, 1
 		clr r21
 		ldi temp, 0xDB
 		mov r8, temp  
@@ -212,12 +249,17 @@ EXT_INT1:
 		cp r8, r21
 		cpc r9, r21
 		cpc r10, r21
-		brne delay2*/
-		pop temp
-		out SREG, temp
-		pop temp1
-		pop temp
-		reti
+		brne delay2
+	pop r8
+	pop r9
+	pop r10
+	pop r23
+	pop r21
+	pop temp
+	out SREG, temp
+	pop temp1
+	pop temp
+	reti
 
 
 
@@ -255,7 +297,13 @@ Timer0OVF: ; interrupt subroutine to Timer0
 	push YH ; save all conflicting registers in the prologue
 	push YL
 	push r25
-	push r24 ; prologue ends
+	push r24
+	push r23
+	push r22
+	push r21
+	push r10 
+	push r9
+	push r8; prologue ends
 		; Load the value of the temporary counter
 		lds r24, TempCounter
 		lds r25, TempCounter+1
@@ -273,17 +321,27 @@ Timer0OVF: ; interrupt subroutine to Timer0
 		lds r22, RevCounter
 		lds r23, RevCounter+1
 		ldi temp, 10
+		; r22*10->r25:r24
 		mul r22, temp
 		mov r24, r0
 		mov r25, r1
+		; r23*10->r1:r0
 		mul r23, temp
-		add r24, r0
+		; r25:r24->r24:r23
+		mov r23, r24
+		mov r24, r25
+		ldi temp, 0
+		clr r25
+		; 0:r24:r23 + r1:r0:0->r25:r24:r23
+		add r23, temp
+		adc r24, r0
 		adc r25, r1
-		lds r22, TargetSpeed
-		ldi r23, 0
-		cp r24, r22
-		cpc r25, r23
+		lds r21, TargetSpeed
+		ldi r22, 0
+		cp r23, r21
+		cpc r24, r22
 		brlo less
+		; more
 		lds r22, OCR3BL
 		lds r23, OCR3BH
 		ldi temp, 1
@@ -319,8 +377,14 @@ Timer0OVF: ; interrupt subroutine to Timer0
 		sts TempCounter+1, r25
  
 	EndIF: 
-		pop r24 ; epilogue starts
-		pop r25 ; restore all conflicting registers from the stack
+		pop r8 ; epilogue starts
+		pop r9 ; restore all conflicting registers from the stack
+		pop r10;
+		pop r21
+		pop r22
+		pop r23
+		pop r24 
+		pop r25 
 		pop YL
 		pop YH
 		pop temp
@@ -332,6 +396,9 @@ Timer0OVF: ; interrupt subroutine to Timer0
 
 main: ; main - does nothing 
 	clr flag
+	clear_2 RevCounter
+	clear_2 TempCounter ; initialize the temporary counter to 0
+    clear_2 SecondCounter ; initialize the second counter to 0
 	ldi temp, 0b00000000
 	out TCCR0A, temp
 	ldi temp, 0b00000010
@@ -438,6 +505,25 @@ sleep_5ms:
 
 
 calculation:
+	/*do_lcd_command 0b00111000 ; 2x5x7
+	rcall sleep_5ms
+	do_lcd_command 0b00111000 ; 2x5x7
+	rcall sleep_1ms
+	do_lcd_command 0b00111000 ; 2x5x7
+	do_lcd_command 0b00111000 ; 2x5x7
+	do_lcd_command 0b00001000 ; display off?*/
+	do_lcd_command 0b00000001 ; clear display
+	do_lcd_command 0b00000110 ; increment, no display shift
+	do_lcd_command 0b00001110 ; Cursor on, bar, no blink
+
+	do_lcd_data 'S'
+	do_lcd_data 'p'
+	do_lcd_data 'e'
+	do_lcd_data 'e'
+	do_lcd_data 'd'
+	do_lcd_data ':'
+	
+	
 	ldi temp, low(10000)
 	mov r3, temp
 	ldi temp, high(10000)
@@ -447,14 +533,15 @@ calculation:
 	ldi temp, high(1000)
 	mov r6, temp
 	ldi temp, 100
-	mov r7, temp
+	mov r9, temp
 	ldi temp, 10
-	mov r8, temp
+	mov r10, temp
 	clr d_5
 	clr d_4
 	clr d_3
 	clr d_2
 	clr d_1
+
 
 	ldi r25, 0
 	lds temp, RevCounter
@@ -493,48 +580,30 @@ calculation:
 		dec d_4
 
 	sub_hundred:
-		sub result_low, r7
+		sub result_low, r9
 		sbc result_high, r25
 		inc d_3
 		cp result_low, r25
 		cpc result_high, r25
 		brge sub_hundred
-		add result_low, r7
+		add result_low, r9
 		adc result_high, r25
 		dec d_3
 
 	sub_ten:
-		sub result_low, r8
+		sub result_low, r10
 		sbc result_high, r25
 		inc d_2
 		cp result_low, r25
 		cpc result_high, r25
 		brge sub_ten
-		add result_low, r8
+		add result_low, r10
 		adc result_high, r25
 		dec d_2
 
 	mov d_1, result_low
 
 
-
-	/*do_lcd_command 0b00111000 ; 2x5x7
-	rcall sleep_5ms
-	do_lcd_command 0b00111000 ; 2x5x7
-	rcall sleep_1ms
-	do_lcd_command 0b00111000 ; 2x5x7
-	do_lcd_command 0b00111000 ; 2x5x7
-	do_lcd_command 0b00001000 ; display off?*/
-	do_lcd_command 0b00000001 ; clear display
-	do_lcd_command 0b00000110 ; increment, no display shift
-	do_lcd_command 0b00001110 ; Cursor on, bar, no blink
-
-	do_lcd_data 'S'
-	do_lcd_data 'p'
-	do_lcd_data 'e'
-	do_lcd_data 'e'
-	do_lcd_data 'd'
-	do_lcd_data ':'
 
 	mov r16, d_5
 	ldi r27, 48
