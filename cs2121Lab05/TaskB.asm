@@ -56,11 +56,11 @@
 .cseg
 	.org 0x0000
 		jmp RESET
-	//.org INT0addr ; INT0addr is the address of EXT_INT0
+	.org INT0addr ; INT0addr is the address of EXT_INT0
 		jmp EXT_INT0
-	//.org INT1addr ; INT1addr is the address of EXT_INT1
+	.org INT1addr ; INT1addr is the address of EXT_INT1
 		jmp EXT_INT1
-	//.org INT2addr ; 
+	.org INT2addr ; 
 		jmp EXT_INT2
 	.org OVF0addr
 		jmp Timer0OVF ; Jump to the interrupt handler for
@@ -95,7 +95,7 @@ RESET:
 	sts OCR3BH, temp1
 	ldi temp1, 0
 	sts OCR3BL, temp1
-	ldi temp1, 0
+	ldi temp1, 50
 	sts TargetSpeed, temp1
 
 	ldi temp1, (1 << CS30) 		; set the Timer3 to Phase Correct PWM mode. 
@@ -125,9 +125,28 @@ RESET:
 	do_lcd_data '0'
 	do_lcd_data '0'
 	do_lcd_data '0'
+/*	lds temp, TargetSpeed
+	ldi temp1, 48
+	add temp, temp1
+	display
+    infloop: rjmp infloop*/
 
 	sei
-	jmp main
+	//jmp main
+	
+//main: ; main - does nothing 
+	clr flag
+	clear_2 RevCounter
+	clear_2 TempCounter ; initialize the temporary counter to 0
+    clear_2 SecondCounter ; initialize the second counter to 0
+	ldi temp, 0b00000000
+	out TCCR0A, temp
+	ldi temp, 0b00000010
+	out TCCR0B, temp ; set prescalar value to 8
+	ldi temp, 1<<TOIE0 ; TOIE0 is the bit number of TOIE0 which is 0
+	sts TIMSK0, temp ; enable Timer0 Overflow Interrupt
+	sei ; enable global interrupt
+	loop: rjmp loop
 
 
 
@@ -168,13 +187,17 @@ EXT_INT0:
 	    do_lcd_command 0b00001110 ; Cursor on, bar, no blink
 		do_lcd_data '0'
 		do_lcd_data '0'
+lds temp, TargetSpeed
+ldi temp1, 48
+add temp, temp1
+display
 		ldi r23, 1
 		clr r21
-		ldi temp, 0xDB
+		ldi temp, 0xB7
 		mov r8, temp  
-		ldi temp, 0x7C
+		ldi temp, 0xF9
 		mov r9, temp
-		ldi temp, 0x03
+		ldi temp, 0x06
 		mov r10, temp
 		delay1:
 		sub r8, r23
@@ -234,13 +257,17 @@ EXT_INT1:
 	    do_lcd_command 0b00001110 ; Cursor on, bar, no blink
 		do_lcd_data '1'
 		do_lcd_data '1'
+lds temp, TargetSpeed
+ldi temp1, 48
+add temp, temp1
+display
 		ldi r23, 1
 		clr r21
-		ldi temp, 0xDB
+		ldi temp, 0xB7
 		mov r8, temp  
-		ldi temp, 0x7C
+		ldi temp, 0xF9
 		mov r9, temp
-		ldi temp, 0x03
+		ldi temp, 0x06
 		mov r10, temp
 		delay2:
 		sub r8, r23
@@ -342,6 +369,9 @@ Timer0OVF: ; interrupt subroutine to Timer0
 		cpc r24, r22
 		brlo less
 		; more
+		cp r23, r21
+		cpc r24, r22
+		breq end_reset
 		lds r22, OCR3BL
 		lds r23, OCR3BH
 		ldi temp, 1
@@ -350,6 +380,7 @@ Timer0OVF: ; interrupt subroutine to Timer0
 		sbc r23, temp1
 		sts OCR3BL, r22
 		sts OCR3BH, r23
+		rjmp end_reset
 	less:
 		lds r22, OCR3BL
 		lds r23, OCR3BH
@@ -359,10 +390,8 @@ Timer0OVF: ; interrupt subroutine to Timer0
 		adc r23, temp1
 		sts OCR3BL, r22
 		sts OCR3BH, r23
-		ldi r22, 0
-		ldi r23, 0
-		sts RevCounter, r22
-		sts RevCounter+1, r23
+    end_reset:
+		clear_2 RevCounter
 		clear_2 TempCounter ; reset the temporary counter
 		; Load the value of the second counter
 		lds r24, SecondCounter
@@ -390,23 +419,9 @@ Timer0OVF: ; interrupt subroutine to Timer0
 		pop temp
 		out SREG, temp
 		reti ; return from the interrupt
-    
 
 
 
-main: ; main - does nothing 
-	clr flag
-	clear_2 RevCounter
-	clear_2 TempCounter ; initialize the temporary counter to 0
-    clear_2 SecondCounter ; initialize the second counter to 0
-	ldi temp, 0b00000000
-	out TCCR0A, temp
-	ldi temp, 0b00000010
-	out TCCR0B, temp ; set prescalar value to 8
-	ldi temp, 1<<TOIE0 ; TOIE0 is the bit number of TOIE0 which is 0
-	sts TIMSK0, temp ; enable Timer0 Overflow Interrupt
-	sei ; enable global interrupt
-	loop: rjmp loop
 
 
 
@@ -512,7 +527,7 @@ calculation:
 	do_lcd_command 0b00111000 ; 2x5x7
 	do_lcd_command 0b00111000 ; 2x5x7
 	do_lcd_command 0b00001000 ; display off?*/
-	do_lcd_command 0b00000001 ; clear display
+/*	do_lcd_command 0b00000001 ; clear display
 	do_lcd_command 0b00000110 ; increment, no display shift
 	do_lcd_command 0b00001110 ; Cursor on, bar, no blink
 
@@ -549,13 +564,6 @@ calculation:
 	lds temp, RevCounter+1
 	mov result_high, temp
 	clr temp
-	/*sts SecondCounter, temp
-	sts SecondCounter+1, temp*/
-	/*ldi r25, 0b11111111
-	mov result_low, r25
-	ldi r25, 0b111111
-	mov result_high, r25
-	ldi r25, 0*/
 
 	sub_ten_thousand:
 		sub result_low, r3
@@ -624,5 +632,5 @@ calculation:
 	mov r16, d_1
 	add r16, r27
 	display
-	do_lcd_data '0'
+	do_lcd_data '0'*/
 	jmp end_calculation
