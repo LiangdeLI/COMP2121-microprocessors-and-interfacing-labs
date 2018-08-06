@@ -1,2 +1,2 @@
 # cs2121lab
-this one will contain all labs files
+This repository will contain all labs files of COMP2121 Microprocessors and Interfacing.
